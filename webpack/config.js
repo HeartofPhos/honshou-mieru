@@ -11,6 +11,9 @@ const buildPath = path.join(__dirname, '..', 'build');
 const assetsPath = path.join(__dirname, '..', 'src', 'assets');
 
 module.exports = {
+  node: {
+    fs: 'empty'
+  },
   devtool: 'source-map',
   entry: './src/index.tsx',
   output: {
