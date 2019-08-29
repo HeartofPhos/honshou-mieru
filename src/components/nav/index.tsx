@@ -10,16 +10,8 @@ const Nav = () => (
   <nav className={styles.nav}>
     <Link className={styles.logoLink} to="/">
       <Logo className={styles.logo} />
-      <h1 className={styles.logoText}>Helix</h1>
+      <h1 className={styles.logoText}>HonshouMieru</h1>
     </Link>
-    <GitHubButton
-      href="https://github.com/fjlaubscher/helix"
-      data-size="large"
-      data-show-count
-      aria-label="Star fjlaubscher/helix on GitHub"
-    >
-      Star
-    </GitHubButton>
   </nav>
 );
 

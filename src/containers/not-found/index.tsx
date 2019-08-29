@@ -7,7 +7,7 @@ import styles from './styles.css';
 
 const NotFound = () => (
   <div className={styles.notFound}>
-    <Helmet title="Helix - Not Found!" />
+    <Helmet title="HonshouMieru - Not Found!" />
     <h1>Uhhh</h1>
     <NotFoundSVG className={styles.image} />
     <p>This doesn&apos;t seem right...</p>

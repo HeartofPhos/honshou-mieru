@@ -11,7 +11,7 @@ const rootElement = document.getElementById('root');
 
 const renderApp = (TheApp: React.FC) => {
   if (rootElement) {
-    const HelixApp = (
+    const HonshouMieruApp = (
       <BrowserRouter basename={publicUrl} forceRefresh={!supportsHistory}>
         <TheApp />
       </BrowserRouter>
@@ -20,8 +20,8 @@ const renderApp = (TheApp: React.FC) => {
     // hydrate the client if dom is already rendered with react-snap
     // only hydrates if you run the build script and host the static files somewhere
     return (
-      (rootElement.hasChildNodes() && hydrate(HelixApp, rootElement)) ||
-      render(HelixApp, rootElement)
+      (rootElement.hasChildNodes() && hydrate(HonshouMieruApp, rootElement)) ||
+      render(HonshouMieruApp, rootElement)
     );
   }
 
