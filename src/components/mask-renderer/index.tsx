@@ -1,6 +1,4 @@
 import React from 'react';
-//@ts-ignore
-import cv = require('../../open-cv/opencv.js');
 
 import styles from './styles.css';
 
