@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import GitHubButton from 'react-github-btn';
 
 import { ReactComponent as Logo } from './logo.svg';
 
