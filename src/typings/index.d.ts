@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+declare module 'get-pixels';
 
 declare module '*.css' {
   const styles: { [className: string]: string };

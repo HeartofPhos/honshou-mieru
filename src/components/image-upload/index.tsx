@@ -1,9 +1,12 @@
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
+import ndarray = require('ndarray');
+import getPixels from 'get-pixels';
+
 import styles from './styles.css';
 
 interface Props {
-  onUpload: (blob: string) => void;
+  onUpload: (image: ndarray) => void;
 }
 
 const ImageUpload = ({ onUpload }: Props) => {
@@ -15,7 +18,15 @@ const ImageUpload = ({ onUpload }: Props) => {
       reader.onerror = () => console.log('file reading has failed');
       reader.onload = () => {
         const dataUrl = reader.result as string;
-        if (dataUrl) onUpload(dataUrl);
+        if (dataUrl) {
+          getPixels(dataUrl, function(err: any, img: ndarray) {
+            if (err) {
+              console.log('Bad image path');
+              return;
+            }
+            onUpload(img);
+          });
+        }
       };
 
       reader.readAsDataURL(acceptedFiles[0]);

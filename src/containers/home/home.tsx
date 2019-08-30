@@ -4,19 +4,20 @@ import ImageUpload from '../../components/image-upload';
 import MaskEditor from '../../components/mask-editor';
 
 import styles from './styles.css';
+import ndarray = require('ndarray');
 
 const Home = () => {
-  const [fileBlob, setFileBlob] = useState<string>('');
+  const [imageArray, setImageArray] = useState<ndarray | undefined>(undefined);
   return (
     <div className={styles.center}>
-      {fileBlob === '' && (
+      {!imageArray && (
         <ImageUpload
-          onUpload={blob => {
-            setFileBlob(blob);
+          onUpload={image => {
+            setImageArray(image);
           }}
         />
       )}
-      {fileBlob !== '' && <MaskEditor blobUrl={fileBlob} />}
+      {imageArray && <MaskEditor imageArray={imageArray} />}
     </div>
   );
 };
