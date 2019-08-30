@@ -24,6 +24,7 @@ const ImageUpload = ({ onUpload }: Props) => {
               console.log('Bad image path');
               return;
             }
+
             onUpload(img);
           });
         }
@@ -36,7 +37,7 @@ const ImageUpload = ({ onUpload }: Props) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     multiple: false,
-    accept: 'image/*'
+    accept: ['image/png', 'image/gif', 'image/jpeg']
   });
 
   return (
