@@ -44,7 +44,7 @@ const MaskEditor = ({ imageArray }: Props) => {
         onMouseDown={(x, y) => {
           console.log({ x, y });
           if (maskArray) {
-            maskArray.set(x, y, cv.GC_FGD);
+            maskArray.set(Math.floor(x), Math.floor(y), cv.GC_FGD);
             setMaskArray(ndarray(maskArray.data, maskArray.shape));
           }
         }}
