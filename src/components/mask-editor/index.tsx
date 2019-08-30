@@ -13,7 +13,7 @@ interface Props {
 }
 
 const MaskEditor = ({ imageArray }: Props) => {
-  const [maskArray, setMaskArray] = useState<number[][] | undefined>(undefined);
+  const [maskArray, setMaskArray] = useState<ndarray | undefined>(undefined);
 
   const imageData = new ImageData(
     new Uint8ClampedArray(imageArray.data),
@@ -24,13 +24,11 @@ const MaskEditor = ({ imageArray }: Props) => {
   if (!maskArray) {
     const newMaskArray = [];
     for (let x = 0; x < imageData.width; x++) {
-      const xArray: number[] = [];
-      newMaskArray.push(xArray);
       for (let y = 0; y < imageData.height; y++) {
-        xArray.push(cv.GC_PR_BGD);
+        newMaskArray.push(cv.GC_PR_BGD);
       }
     }
-    setMaskArray(newMaskArray);
+    setMaskArray(ndarray(newMaskArray, [imageData.width, imageData.height]));
   }
 
   return (
@@ -40,8 +38,8 @@ const MaskEditor = ({ imageArray }: Props) => {
         onMouseDown={(x, y) => {
           console.log({ x, y });
           if (maskArray) {
-            maskArray[x][y] = cv.GC_FGD;
-            setMaskArray(maskArray.slice(0));
+            maskArray.set(x, y, cv.GC_FGD);
+            setMaskArray(ndarray(maskArray.data, maskArray.shape));
           }
         }}
         mask={maskArray}

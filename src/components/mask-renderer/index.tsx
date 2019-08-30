@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 
 import styles from './styles.css';
+import ndarray = require('ndarray');
 
 interface PositionCallback {
   (x: number, y: number): void;
@@ -15,7 +16,7 @@ enum MaskType {
 
 interface Props {
   imageData: ImageData;
-  mask: number[][] | undefined;
+  mask: ndarray | undefined;
   onMouseDown?: PositionCallback;
   onMouseUp?: PositionCallback;
   onMouseMove?: PositionCallback;
@@ -62,7 +63,7 @@ const MaskRenderer = ({
     if (mask) {
       for (let x = 0; x < imageData.width; x++) {
         for (let y = 0; y < imageData.height; y++) {
-          switch (mask[x][y] as MaskType) {
+          switch (mask.get(x, y) as MaskType) {
             case MaskType.Foreground:
               {
                 ctx.fillStyle = foregroundColour;
