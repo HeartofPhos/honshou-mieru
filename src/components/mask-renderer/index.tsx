@@ -16,7 +16,7 @@ enum MaskType {
 
 interface Props {
   imageData: ImageData;
-  mask: ndarray | undefined;
+  mask: ndarray;
   onMouseDown?: PositionCallback;
   onMouseUp?: PositionCallback;
   onMouseMove?: PositionCallback;
@@ -58,23 +58,21 @@ const MaskRenderer = ({
     canvas.width = imageData.width;
     ctx.putImageData(imageData, 0, 0);
 
-    if (mask) {
-      for (let x = 0; x < imageData.width; x++) {
-        for (let y = 0; y < imageData.height; y++) {
-          switch (mask.get(x, y) as MaskType) {
-            case MaskType.Foreground:
-              {
-                ctx.fillStyle = foregroundColour;
-                ctx.fillRect(x, y, 1, 1);
-              }
-              break;
-            case MaskType.Background:
-              {
-                ctx.fillStyle = backgroundColour;
-                ctx.fillRect(x, y, 1, 1);
-              }
-              break;
-          }
+    for (let x = 0; x < imageData.width; x++) {
+      for (let y = 0; y < imageData.height; y++) {
+        switch (mask.get(x, y) as MaskType) {
+          case MaskType.Foreground:
+            {
+              ctx.fillStyle = foregroundColour;
+              ctx.fillRect(x, y, 1, 1);
+            }
+            break;
+          case MaskType.Background:
+            {
+              ctx.fillStyle = backgroundColour;
+              ctx.fillRect(x, y, 1, 1);
+            }
+            break;
         }
       }
     }

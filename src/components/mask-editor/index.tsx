@@ -1,20 +1,14 @@
 //@ts-ignore
 import cv = require('../../open-cv/opencv.js');
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import ndarray = require('ndarray');
 
 import MaskRenderer from '../mask-renderer';
 
-import styles from './styles.css';
-import src from '*.png';
-
 interface Props {
   imageArray: ndarray;
 }
-
-const MaskEditor = ({ imageArray }: Props) => {
-  const [maskArray, setMaskArray] = useState<ndarray | undefined>(undefined);
-
+const buildImageData = (imageArray: ndarray): ImageData => {
   const imageData = new ImageData(imageArray.shape[0], imageArray.shape[1]);
   let i = 0;
   for (let y = 0; y < imageArray.shape[1]; y++) {
@@ -27,29 +21,47 @@ const MaskEditor = ({ imageArray }: Props) => {
     }
   }
 
-  if (!maskArray) {
-    const newMaskArray = [];
-    for (let x = 0; x < imageData.width; x++) {
-      for (let y = 0; y < imageData.height; y++) {
-        newMaskArray.push(cv.GC_PR_BGD);
-      }
+  return imageData;
+};
+
+const buildMask = (imageArray: ndarray, imageData: ImageData): ndarray => {
+  const newMaskArray = [];
+  for (let x = 0; x < imageData.width; x++) {
+    for (let y = 0; y < imageData.height; y++) {
+      newMaskArray.push(cv.GC_PR_BGD);
     }
-    setMaskArray(ndarray(newMaskArray, [imageData.width, imageData.height]));
   }
+
+  return ndarray(newMaskArray, [imageData.width, imageData.height]);
+};
+
+const MaskEditor = ({ imageArray }: Props) => {
+  const [imageData, setImageData] = useState<ImageData>();
+  const [mask, setMask] = useState<ndarray>();
+
+  useMemo(() => {
+    const newImageData = buildImageData(imageArray);
+    const newMask = buildMask(imageArray, newImageData);
+
+    setImageData(newImageData);
+    setMask(newMask);
+  }, [imageArray]);
 
   return (
     <div>
-      <MaskRenderer
-        imageData={imageData}
-        onMouseDown={(x, y) => {
-          console.log({ x, y });
-          if (maskArray) {
-            maskArray.set(Math.floor(x), Math.floor(y), cv.GC_FGD);
-            setMaskArray(ndarray(maskArray.data, maskArray.shape));
-          }
-        }}
-        mask={maskArray}
-      />
+      {imageData && mask && (
+        <MaskRenderer
+          imageData={imageData}
+          mask={mask}
+          onMouseDown={(x, y) => {
+            console.log({ x, y });
+            if (mask) {
+              mask.set(Math.floor(x), Math.floor(y), cv.GC_FGD);
+              setMask(ndarray(mask.data, mask.shape));
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
