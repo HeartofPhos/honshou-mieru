@@ -1,13 +1,17 @@
 .rendererDiv {
-    position: relative;
+  position: relative;
 }
 
 .imageCanvas {
   position: relative;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 
 .maskCanvas {
   position: absolute;
   top: 0;
   left: 0;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }

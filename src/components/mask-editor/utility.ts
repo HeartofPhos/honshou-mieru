@@ -43,7 +43,5 @@ export const InitializeMaskCanvas = (
 
   canvas.width = width;
   canvas.height = height;
-
-  ctx.fillStyle = 'rgba(255,0,0,0.5)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
