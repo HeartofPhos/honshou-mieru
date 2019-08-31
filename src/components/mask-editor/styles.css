@@ -1,9 +1,13 @@
-.center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.rendererDiv {
+    position: relative;
 }
 
-.canvas {
-    margin: 1rem;
+.imageCanvas {
+  position: relative;
+}
+
+.maskCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
