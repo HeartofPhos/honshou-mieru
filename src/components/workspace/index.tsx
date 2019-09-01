@@ -65,10 +65,8 @@ const Workspace = ({ imageArray }: Props) => {
           <MaskEditor
             imageData={baseImageData}
             targetMaskType={targetMaskType}
-            onMaskChanged={(x, y, width, height, maskType) => {
-              console.log(
-                `Mask change: (${x}, ${y}, ${width}, ${height}, ${maskType})`
-              );
+            onMaskChanged={(changedIndexes, maskType) => {
+              console.log(`Mask change: ${maskType}`);
             }}
           ></MaskEditor>
         )}

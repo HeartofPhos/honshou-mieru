@@ -20,14 +20,13 @@ export const InitializeMaskCanvas = (
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 };
 
+interface MaskIndex {
+  x: number;
+  y: number;
+}
+
 interface MaskChangedCallback {
-  (
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-    maskType: MaskType
-  ): void;
+  (changedIndexes: MaskIndex[], maskType: MaskType): void;
 }
 
 interface Props {
@@ -59,49 +58,40 @@ const MaskEditor = ({ targetMaskType, imageData, onMaskChanged }: Props) => {
           const canvasY = evt.clientY - rect.top;
 
           let fillStyle;
-          let x = 0;
-          let y = 0;
-          let width = 0;
-          let height = 0;
+          const x = canvasX - 5;
+          const y = canvasY - 5;
+          const width = 11;
+          const height = 11;
 
           switch (targetMaskType) {
             case MaskType.Background:
               {
-                fillStyle = '#ff0000';
-                x = canvasX;
-                y = canvasY;
-                width = 1;
-                height = 1;
+                fillStyle = 'rgba(255,0,0,0.5)';
               }
               break;
             case MaskType.Foreground:
               {
-                fillStyle = '#00ff00';
-                x = canvasX;
-                y = canvasY;
-                width = 1;
-                height = 1;
-              }
-              break;
-            case MaskType.ProbablyBackground:
-            case MaskType.ProbablyForeground:
-              {
-                x = canvasX - 5;
-                y = canvasY - 5;
-                width = 11;
-                height = 11;
+                fillStyle = 'rgba(0,255,0,0.5)';
               }
               break;
           }
+
+          ctx.clearRect(x, y, width, height);
 
           if (fillStyle) {
             ctx.fillStyle = fillStyle;
             ctx.fillRect(x, y, width, height);
-          } else {
-            ctx.clearRect(x, y, width, height);
           }
 
-          if (onMaskChanged) onMaskChanged(x, y, width, height, targetMaskType);
+          const changedIndexes: MaskIndex[] = [];
+
+          for (let i = x; i < x + width; i++) {
+            for (let j = y; j < y + height; j++) {
+              changedIndexes.push({ x: i, y: j });
+            }
+          }
+
+          if (onMaskChanged) onMaskChanged(changedIndexes, targetMaskType);
         }}
         className={styles.maskCanvas}
         ref={maskCanvasRef}
