@@ -7,9 +7,7 @@
     "outDir": "build",
     "strict": true,
     "noImplicitAny": true,
-    "esModuleInterop": true,
+    "esModuleInterop": true
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
