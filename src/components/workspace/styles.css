@@ -1,0 +1,9 @@
+.center {
+  display: flex;
+  align-items: center;
+}
+
+.buttonGroup {
+  display: flex;
+  align-items: center;
+}

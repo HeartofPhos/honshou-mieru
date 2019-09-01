@@ -1,43 +1,49 @@
 //@ts-ignore
-import cv = require('../../open-cv/opencv.js');
-import React, { useEffect, useState } from 'react';
-import ndarray = require('ndarray');
-
-import {
-  BuildImageData,
-  InitializeImageCanvas,
-  InitializeMaskCanvas
-} from './utility';
+import React, { useEffect } from 'react';
+import { InitializeCanvasFromImage, MaskType } from '../../utility';
 import styles from './styles.css';
 
-const foregroundColour = '#00ff00';
-const backgroundColour = '#ff0000';
+export const MaskTypeToColor = (maskType: MaskType) => {};
 
-enum MaskType {
-  Background,
-  Foreground,
-  ProbablyBackground,
-  ProbablyForeground
-}
+export const InitializeMaskCanvas = (
+  maskCanvasRef: React.RefObject<HTMLCanvasElement>,
+  width: number,
+  height: number
+) => {
+  const canvas = maskCanvasRef.current;
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  canvas.width = width;
+  canvas.height = height;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+};
 
 interface MaskChangedCallback {
-  (x: number, y: number, maskType: MaskType): void;
+  (
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    maskType: MaskType
+  ): void;
 }
 
 interface Props {
-  imageArray: ndarray;
+  imageData: ImageData;
+  targetMaskType: MaskType;
   onMaskChanged?: MaskChangedCallback;
 }
 
-const MaskEditor = ({ imageArray, onMaskChanged }: Props) => {
+const MaskEditor = ({ targetMaskType, imageData, onMaskChanged }: Props) => {
   const imageCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const maskCanvasRef = React.useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const imageData = BuildImageData(imageArray);
-    InitializeImageCanvas(imageCanvasRef, imageData);
+    InitializeCanvasFromImage(imageCanvasRef, imageData);
     InitializeMaskCanvas(maskCanvasRef, imageData.width, imageData.height);
-  }, [imageArray]);
+  }, [imageData]);
 
   return (
     <div className={styles.rendererDiv}>
@@ -49,13 +55,53 @@ const MaskEditor = ({ imageArray, onMaskChanged }: Props) => {
           if (!ctx) return;
 
           const rect = canvas.getBoundingClientRect();
-          const x = evt.clientX - rect.left;
-          const y = evt.clientY - rect.top;
+          const canvasX = evt.clientX - rect.left;
+          const canvasY = evt.clientY - rect.top;
 
-          ctx.fillStyle = foregroundColour;
-          ctx.fillRect(x, y, 1, 1);
+          let fillStyle;
+          let x = 0;
+          let y = 0;
+          let width = 0;
+          let height = 0;
 
-          if (onMaskChanged) onMaskChanged(x, y, MaskType.Foreground);
+          switch (targetMaskType) {
+            case MaskType.Background:
+              {
+                fillStyle = '#ff0000';
+                x = canvasX;
+                y = canvasY;
+                width = 1;
+                height = 1;
+              }
+              break;
+            case MaskType.Foreground:
+              {
+                fillStyle = '#00ff00';
+                x = canvasX;
+                y = canvasY;
+                width = 1;
+                height = 1;
+              }
+              break;
+            case MaskType.ProbablyBackground:
+            case MaskType.ProbablyForeground:
+              {
+                x = canvasX - 5;
+                y = canvasY - 5;
+                width = 11;
+                height = 11;
+              }
+              break;
+          }
+
+          if (fillStyle) {
+            ctx.fillStyle = fillStyle;
+            ctx.fillRect(x, y, width, height);
+          } else {
+            ctx.clearRect(x, y, width, height);
+          }
+
+          if (onMaskChanged) onMaskChanged(x, y, width, height, targetMaskType);
         }}
         className={styles.maskCanvas}
         ref={maskCanvasRef}

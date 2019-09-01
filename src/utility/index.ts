@@ -17,7 +17,7 @@ export const BuildImageData = (imageArray: ndarray): ImageData => {
   return imageData;
 };
 
-export const InitializeImageCanvas = (
+export const InitializeCanvasFromImage = (
   imageCanvasRef: React.RefObject<HTMLCanvasElement>,
   imageData: ImageData
 ) => {
@@ -31,17 +31,9 @@ export const InitializeImageCanvas = (
   ctx.putImageData(imageData, 0, 0);
 };
 
-export const InitializeMaskCanvas = (
-  maskCanvasRef: React.RefObject<HTMLCanvasElement>,
-  width: number,
-  height: number
-) => {
-  const canvas = maskCanvasRef.current;
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-
-  canvas.width = width;
-  canvas.height = height;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-};
+export enum MaskType {
+  Background,
+  Foreground,
+  ProbablyBackground,
+  ProbablyForeground
+}
