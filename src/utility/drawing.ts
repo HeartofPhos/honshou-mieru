@@ -17,8 +17,8 @@ const StepDrawBresenhamLine = (
   let err = (dx > dy ? dx : -dy) / 2;
 
   while (true) {
-    step(x0, y0);
     if (x0 === x1 && y0 === y1) break;
+    step(x0, y0);
     var e2 = err;
     if (e2 > -dx) {
       err -= dy;
@@ -35,50 +35,51 @@ const DrawPixel = (x: number, y: number, ctx: CanvasRenderingContext2D) => {
   ctx.fillRect(x, y, 1, 1);
 };
 
+const DrawHorizontalLine = (
+  x0: number,
+  y0: number,
+  x1: number,
+  ctx: CanvasRenderingContext2D
+) => {
+  for (let x = x0; x <= x1; ++x) DrawPixel(x, y0, ctx);
+};
+
+const Plot4Points = (
+  cx: number,
+  cy: number,
+  x: number,
+  y: number,
+  ctx: CanvasRenderingContext2D
+) => {
+  DrawHorizontalLine(cx - x, cy + y, cx + x, ctx);
+  if (y != 0) DrawHorizontalLine(cx - x, cy - y, cx + x, ctx);
+};
+
 const DrawCircle = (
-  centerX: number,
-  centerY: number,
+  cx: number,
+  cy: number,
   radius: number,
   ctx: CanvasRenderingContext2D
 ) => {
+  let error = -radius;
   let x = radius;
   let y = 0;
-  let radiusError = 1 - x;
 
   while (x >= y) {
-    let startX = -x + centerX;
-    let endX = x + centerX;
-    StepDrawBresenhamLine(startX, y + centerY, endX, y + centerY, (x, y) =>
-      DrawPixel(x, y, ctx)
-    );
-    if (y != 0) {
-      StepDrawBresenhamLine(startX, -y + centerY, endX, -y + centerY, (x, y) =>
-        DrawPixel(x, y, ctx)
-      );
-    }
+    let lastY = y;
 
-    y++;
+    error += y;
+    ++y;
+    error += y;
 
-    if (radiusError < 0) {
-      radiusError += 2 * y + 1;
-    } else {
-      if (x >= y) {
-        startX = -y + 1 + centerX;
-        endX = y - 1 + centerX;
+    Plot4Points(cx, cy, x, lastY, ctx);
 
-        StepDrawBresenhamLine(startX, x + centerY, endX, x + centerY, (x, y) =>
-          DrawPixel(x, y, ctx)
-        );
-        StepDrawBresenhamLine(
-          startX,
-          -x + centerY,
-          endX,
-          -x + centerY,
-          (x, y) => DrawPixel(x, y, ctx)
-        );
-      }
-      x--;
-      radiusError += 2 * (y - x + 1);
+    if (error >= 0) {
+      if (x != lastY) Plot4Points(cx, cy, lastY, x, ctx);
+
+      error -= x;
+      --x;
+      error -= x;
     }
   }
 };
