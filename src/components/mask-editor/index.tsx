@@ -36,7 +36,7 @@ interface Props {
   onMaskChanged?: MaskChangedCallback;
 }
 
-const ForegroundBrush = new CirclePixelBrush(14, '#00ff00');
+const ForegroundBrush = new CirclePixelBrush(14, 'rgba(0,255,0,0.5)');
 
 const MaskEditor = ({ targetMaskType, imageData, onMaskChanged }: Props) => {
   const imageCanvasRef = React.useRef<HTMLCanvasElement>(null);
