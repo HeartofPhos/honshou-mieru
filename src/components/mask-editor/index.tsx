@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { InitializeCanvasFromImage, MaskType } from '../../utility';
 import styles from './styles.css';
+import CirclePixelBrush from '../../utility/drawing';
 
 export const MaskTypeToColor = (maskType: MaskType) => {};
 
@@ -35,6 +36,8 @@ interface Props {
   onMaskChanged?: MaskChangedCallback;
 }
 
+const ForegroundBrush = new CirclePixelBrush(14, '#00ff00');
+
 const MaskEditor = ({ targetMaskType, imageData, onMaskChanged }: Props) => {
   const imageCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const maskCanvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -57,41 +60,24 @@ const MaskEditor = ({ targetMaskType, imageData, onMaskChanged }: Props) => {
           const canvasX = evt.clientX - rect.left;
           const canvasY = evt.clientY - rect.top;
 
-          let fillStyle;
-          const x = canvasX - 5;
-          const y = canvasY - 5;
-          const width = 11;
-          const height = 11;
+          ForegroundBrush.DrawToContext(canvasX, canvasY, ctx);
+        }}
+        onPointerMove={evt => {
+          const canvas = evt.currentTarget;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return;
 
-          switch (targetMaskType) {
-            case MaskType.Background:
-              {
-                fillStyle = 'rgba(255,0,0,0.5)';
-              }
-              break;
-            case MaskType.Foreground:
-              {
-                fillStyle = 'rgba(0,255,0,0.5)';
-              }
-              break;
-          }
+          const rect = canvas.getBoundingClientRect();
+          const canvasX = evt.clientX - rect.left;
+          const canvasY = evt.clientY - rect.top;
 
-          ctx.clearRect(x, y, width, height);
-
-          if (fillStyle) {
-            ctx.fillStyle = fillStyle;
-            ctx.fillRect(x, y, width, height);
-          }
-
-          const changedIndexes: MaskIndex[] = [];
-
-          for (let i = x; i < x + width; i++) {
-            for (let j = y; j < y + height; j++) {
-              changedIndexes.push({ x: i, y: j });
-            }
-          }
-
-          if (onMaskChanged) onMaskChanged(changedIndexes, targetMaskType);
+          ForegroundBrush.DrawLineToContext(
+            canvasX,
+            canvasY,
+            canvasX + evt.movementX,
+            canvasY + evt.movementY,
+            ctx
+          );
         }}
         className={styles.maskCanvas}
         ref={maskCanvasRef}
