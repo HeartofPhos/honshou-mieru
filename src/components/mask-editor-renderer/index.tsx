@@ -17,20 +17,21 @@ const InitializeMaskCanvas = (
 };
 
 const SetBrushFromMaskType = (maskEditor: MaskEditor, maskType: MaskType) => {
+  const size = 10;
   switch (maskType) {
     case MaskType.Background:
       {
-        maskEditor.SetBrush(10, 'rgba(255,0,0,0.5)');
+        maskEditor.SetBrush(size, 'rgba(255,0,0,0.5)');
       }
       break;
     case MaskType.Foreground:
       {
-        maskEditor.SetBrush(10, 'rgba(0,255,0,0.5)');
+        maskEditor.SetBrush(size, 'rgba(0,255,0,0.5)');
       }
       break;
     default:
       {
-        maskEditor.SetBrush(10, null);
+        maskEditor.SetBrush(size, null);
       }
       break;
   }
