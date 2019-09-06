@@ -7,9 +7,9 @@ import {
   BuildImageData,
   InitializeCanvasFromImage,
   MaskType
-} from '../../utility';
+} from '../../utility/misc';
 import styles from './styles.css';
-import MaskEditor from '../mask-editor';
+import MaskEditorRenderer from '../mask-editor-renderer';
 
 interface Props {
   imageArray: ndarray;
@@ -139,16 +139,10 @@ const Workspace = ({ imageArray }: Props) => {
       </div>
       <div className={styles.center}>
         {baseImageData && (
-          <MaskEditor
+          <MaskEditorRenderer
             imageData={baseImageData}
             targetMaskType={targetMaskType}
-            onMaskChanged={(changedIndexes, maskType) => {
-              changedIndexes.forEach(maskIndex => {
-                maskMat.ucharPtr(maskIndex.y, maskIndex.x)[0] = maskType;
-              });
-              console.log(`Mask change: ${maskType}`);
-            }}
-          ></MaskEditor>
+          ></MaskEditorRenderer>
         )}
         <canvas ref={resultCanvasRef}></canvas>
       </div>
