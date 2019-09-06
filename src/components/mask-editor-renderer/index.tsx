@@ -64,6 +64,8 @@ const MaskEditorRenderer = ({ targetMaskType, imageData }: Props) => {
   }, [targetMaskType]);
 
   let isDrawing = false;
+  let lastX = 0;
+  let lastY = 0;
   return (
     <div className={styles.rendererDiv}>
       <canvas className={styles.imageCanvas} ref={imageCanvasRef}></canvas>
@@ -89,6 +91,9 @@ const MaskEditorRenderer = ({ targetMaskType, imageData }: Props) => {
 
           maskEditor.Draw(x, y);
 
+          lastX = x;
+          lastY = y;
+
           const ctx = canvas.getContext('2d');
           if (!ctx) return;
           ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -103,7 +108,10 @@ const MaskEditorRenderer = ({ targetMaskType, imageData }: Props) => {
           const x = evt.clientX - rect.left;
           const y = evt.clientY - rect.top;
 
-          maskEditor.DrawLine(x, y, x + evt.movementX, y + evt.movementY);
+          maskEditor.DrawLine(lastX, lastY, x, y);
+
+          lastX = x;
+          lastY = y;
 
           const ctx = canvas.getContext('2d');
           if (!ctx) return;
