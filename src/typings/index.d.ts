@@ -30,6 +30,14 @@ declare module '*.svg' {
   export default src;
 }
 
+declare module 'worker-loader!*' {
+  class WebpackWorker extends Worker {
+    public constructor();
+  }
+
+  export default WebpackWorker;
+}
+
 declare namespace NodeJS {
   interface ProcessEnv {
     readonly NODE_ENV: 'development' | 'production';

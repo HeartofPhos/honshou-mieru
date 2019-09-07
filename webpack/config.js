@@ -18,7 +18,8 @@ module.exports = {
   entry: './src/index.tsx',
   output: {
     path: buildPath,
-    filename: '[name].bundle.js'
+    filename: '[name].bundle.js',
+    globalObject: 'this'
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js']
