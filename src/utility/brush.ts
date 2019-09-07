@@ -17,8 +17,8 @@ const StepDrawBresenhamLine = (
   let err = (dx > dy ? dx : -dy) / 2;
 
   while (true) {
-    if (x0 === x1 && y0 === y1) break;
     step(x0, y0);
+    if (x0 === x1 && y0 === y1) break;
     var e2 = err;
     if (e2 > -dx) {
       err -= dy;
