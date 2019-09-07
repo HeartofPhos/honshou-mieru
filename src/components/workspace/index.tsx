@@ -87,61 +87,78 @@ const Workspace = ({ imageArray }: Props) => {
         >
           Clear
         </button>
-        <button
-          onClick={() => {
-            if (!resultImageData) return;
-            if (!imgMat) return;
-
-            let src = new cv.Mat();
-            cv.cvtColor(imgMat, src, cv.COLOR_RGBA2RGB, 0);
-
-            let bgdModel = new cv.Mat();
-            let fgdModel = new cv.Mat();
-
-            let rect = new cv.Rect(50, 50, 100, 100);
-            cv.grabCut(
-              src,
-              maskMat,
-              rect,
-              bgdModel,
-              fgdModel,
-              1,
-              cv.GC_INIT_WITH_MASK
-            );
-
-            console.log('success');
-
-            const newResultImageData = BuildImageData(imageArray);
-
-            let i = 0;
-            for (let y = 0; y < src.rows; y++) {
-              for (let x = 0; x < src.cols; x++) {
-                if (
-                  maskMat.ucharPtr(y, x)[0] == MaskType.Background ||
-                  maskMat.ucharPtr(y, x)[0] == MaskType.ProbablyBackground
-                ) {
-                  newResultImageData.data[i + 3] = 0;
-                }
-
-                i += 4;
-              }
-            }
-
-            setResultImageData(newResultImageData);
-
-            src.delete();
-            bgdModel.delete();
-            fgdModel.delete();
-          }}
-        >
-          Render
-        </button>
       </div>
       <div className={styles.center}>
         {baseImageData && (
           <MaskEditorRenderer
             imageData={baseImageData}
             targetMaskType={targetMaskType}
+            OnMaskChanged={imageData => {
+              if (!imgMat) return;
+              if (!maskMat) return;
+
+              for (let x = 0; x < imageData.width; x++) {
+                for (let y = 0; y < imageData.height; y++) {
+                  let i = y * imageData.width * 4 + x * 4;
+
+                  if (imageData.data[i] == 255) {
+                    //Red == 255
+                    maskMat.ucharPtr(y, x)[0] = MaskType.Background;
+                  } else if (imageData.data[i + 1] == 255) {
+                    //Green == 255
+                    maskMat.ucharPtr(y, x)[0] = MaskType.Foreground;
+                  } else if (
+                    imageData.data[i] != 0 ||
+                    imageData.data[i + 1] != 0 ||
+                    imageData.data[i + 2] != 0 ||
+                    imageData.data[i + 3] != 0
+                  ) {
+                    console.log('Problem with mask');
+                  }
+                }
+              }
+
+              let src = new cv.Mat();
+              cv.cvtColor(imgMat, src, cv.COLOR_RGBA2RGB, 0);
+
+              let bgdModel = new cv.Mat();
+              let fgdModel = new cv.Mat();
+
+              let rect = new cv.Rect(50, 50, 100, 100);
+              cv.grabCut(
+                src,
+                maskMat,
+                rect,
+                bgdModel,
+                fgdModel,
+                1,
+                cv.GC_INIT_WITH_MASK
+              );
+
+              console.log('success');
+
+              const newResultImageData = BuildImageData(imageArray);
+
+              let i = 0;
+              for (let y = 0; y < src.rows; y++) {
+                for (let x = 0; x < src.cols; x++) {
+                  if (
+                    maskMat.ucharPtr(y, x)[0] == MaskType.Background ||
+                    maskMat.ucharPtr(y, x)[0] == MaskType.ProbablyBackground
+                  ) {
+                    newResultImageData.data[i + 3] = 0;
+                  }
+
+                  i += 4;
+                }
+              }
+
+              setResultImageData(newResultImageData);
+
+              src.delete();
+              bgdModel.delete();
+              fgdModel.delete();
+            }}
           ></MaskEditorRenderer>
         )}
         <canvas ref={resultCanvasRef}></canvas>

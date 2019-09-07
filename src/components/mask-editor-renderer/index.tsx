@@ -37,12 +37,19 @@ const SetBrushFromMaskType = (maskEditor: MaskEditor, maskType: MaskType) => {
   }
 };
 
+type OnMaskChanged = (imageData: ImageData) => void;
+
 interface Props {
   imageData: ImageData;
   targetMaskType: MaskType;
+  OnMaskChanged?: OnMaskChanged;
 }
 
-const MaskEditorRenderer = ({ targetMaskType, imageData }: Props) => {
+const MaskEditorRenderer = ({
+  imageData,
+  targetMaskType,
+  OnMaskChanged
+}: Props) => {
   const imageCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const maskCanvasRef = React.useRef<HTMLCanvasElement>(null);
 
@@ -73,11 +80,17 @@ const MaskEditorRenderer = ({ targetMaskType, imageData }: Props) => {
         onPointerUp={evt => {
           if (isDrawing) {
             isDrawing = false;
+            if (maskEditor && OnMaskChanged) {
+              OnMaskChanged(maskEditor.GetData());
+            }
           }
         }}
         onPointerOut={evt => {
           if (isDrawing) {
             isDrawing = false;
+            if (maskEditor && OnMaskChanged) {
+              OnMaskChanged(maskEditor.GetData());
+            }
           }
         }}
         onPointerDown={evt => {

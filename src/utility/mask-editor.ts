@@ -40,6 +40,15 @@ class MaskEditor {
   public DrawToContext(x: number, y: number, target: CanvasRenderingContext2D) {
     target.drawImage(this.maskCanvas, x, y);
   }
+
+  public GetData() {
+    return this.maskCtx.getImageData(
+      0,
+      0,
+      this.maskCanvas.width,
+      this.maskCanvas.height
+    );
+  }
 }
 
 export default MaskEditor;
