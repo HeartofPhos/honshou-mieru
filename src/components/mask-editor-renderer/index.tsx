@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { InitializeCanvasFromImage, MaskType } from '../../utility/misc';
 import styles from './styles.css';
-import MaskEditor from '../../utility/mask-editor';
+import MaskEditor from './mask-editor';
 
 const InitializeMaskCanvas = (
   maskCanvasRef: React.RefObject<HTMLCanvasElement>,
