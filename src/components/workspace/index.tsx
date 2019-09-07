@@ -119,7 +119,7 @@ const Workspace = ({ imageArray }: Props) => {
 
               let bgdModel = new cv.Mat();
               let fgdModel = new cv.Mat();
-              let rect = new cv.Rect(50, 50, 100, 100);
+              let rect = new cv.Rect(0, 0, 1, 1);
 
               cv.grabCut(
                 src,
