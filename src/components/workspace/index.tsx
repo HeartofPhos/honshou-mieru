@@ -107,13 +107,9 @@ const Workspace = ({ imageArray }: Props) => {
                   } else if (imageData.data[i + 1] == 255) {
                     //Green == 255
                     maskMat.ucharPtr(y, x)[0] = MaskType.Foreground;
-                  } else if (
-                    imageData.data[i] != 0 ||
-                    imageData.data[i + 1] != 0 ||
-                    imageData.data[i + 2] != 0 ||
-                    imageData.data[i + 3] != 0
-                  ) {
-                    console.log('Problem with mask');
+                  } else if (imageData.data[i + 3] == 0) {
+                    //Alpha == 0
+                    maskMat.ucharPtr(y, x)[0] = MaskType.ProbablyBackground;
                   }
                 }
               }
