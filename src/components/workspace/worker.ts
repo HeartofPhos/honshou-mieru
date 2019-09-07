@@ -1,7 +1,6 @@
 //@ts-ignore
 import cv = require('../../open-cv/opencv.js');
-
-const ctx: Worker = self as any;
+const ctx = self as any;
 
 cv.onRuntimeInitialized = async () => {
   ctx.postMessage({ action: 'ready' });
@@ -159,7 +158,7 @@ ctx.addEventListener('message', evt => {
           grabCutWorker.Dispose();
           grabCutWorker = null;
         }
-        ctx.terminate();
+        ctx.close();
       }
       break;
   }
