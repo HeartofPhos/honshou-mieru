@@ -7,9 +7,9 @@ import {
   BuildImageData,
   InitializeCanvasFromImage,
   MaskType
-} from '../../utility';
+} from '../../utility/misc';
 import styles from './styles.css';
-import MaskEditor from '../mask-editor';
+import MaskEditorRenderer from '../mask-editor-renderer';
 
 interface Props {
   imageArray: ndarray;
@@ -87,68 +87,75 @@ const Workspace = ({ imageArray }: Props) => {
         >
           Clear
         </button>
-        <button
-          onClick={() => {
-            if (!resultImageData) return;
-            if (!imgMat) return;
-
-            let src = new cv.Mat();
-            cv.cvtColor(imgMat, src, cv.COLOR_RGBA2RGB, 0);
-
-            let bgdModel = new cv.Mat();
-            let fgdModel = new cv.Mat();
-
-            let rect = new cv.Rect(50, 50, 100, 100);
-            cv.grabCut(
-              src,
-              maskMat,
-              rect,
-              bgdModel,
-              fgdModel,
-              1,
-              cv.GC_INIT_WITH_MASK
-            );
-
-            console.log('success');
-
-            const newResultImageData = BuildImageData(imageArray);
-
-            let i = 0;
-            for (let y = 0; y < src.rows; y++) {
-              for (let x = 0; x < src.cols; x++) {
-                if (
-                  maskMat.ucharPtr(y, x)[0] == MaskType.Background ||
-                  maskMat.ucharPtr(y, x)[0] == MaskType.ProbablyBackground
-                ) {
-                  newResultImageData.data[i + 3] = 0;
-                }
-
-                i += 4;
-              }
-            }
-
-            setResultImageData(newResultImageData);
-
-            src.delete();
-            bgdModel.delete();
-            fgdModel.delete();
-          }}
-        >
-          Render
-        </button>
       </div>
       <div className={styles.center}>
         {baseImageData && (
-          <MaskEditor
+          <MaskEditorRenderer
             imageData={baseImageData}
             targetMaskType={targetMaskType}
-            onMaskChanged={(changedIndexes, maskType) => {
-              changedIndexes.forEach(maskIndex => {
-                maskMat.ucharPtr(maskIndex.y, maskIndex.x)[0] = maskType;
-              });
-              console.log(`Mask change: ${maskType}`);
+            OnMaskChanged={imageData => {
+              if (!imgMat) return;
+              if (!maskMat) return;
+
+              for (let x = 0; x < imageData.width; x++) {
+                for (let y = 0; y < imageData.height; y++) {
+                  let i = y * imageData.width * 4 + x * 4;
+
+                  if (imageData.data[i] == 255) {
+                    //Red == 255
+                    maskMat.ucharPtr(y, x)[0] = MaskType.Background;
+                  } else if (imageData.data[i + 1] == 255) {
+                    //Green == 255
+                    maskMat.ucharPtr(y, x)[0] = MaskType.Foreground;
+                  } else if (imageData.data[i + 3] == 0) {
+                    //Alpha == 0
+                    maskMat.ucharPtr(y, x)[0] = MaskType.ProbablyBackground;
+                  }
+                }
+              }
+
+              let src = new cv.Mat();
+              cv.cvtColor(imgMat, src, cv.COLOR_RGBA2RGB, 0);
+
+              let bgdModel = new cv.Mat();
+              let fgdModel = new cv.Mat();
+              let rect = new cv.Rect(50, 50, 100, 100);
+
+              cv.grabCut(
+                src,
+                maskMat,
+                rect,
+                bgdModel,
+                fgdModel,
+                1,
+                cv.GC_INIT_WITH_MASK
+              );
+
+              console.log('success');
+
+              const newResultImageData = BuildImageData(imageArray);
+
+              let i = 0;
+              for (let y = 0; y < src.rows; y++) {
+                for (let x = 0; x < src.cols; x++) {
+                  if (
+                    maskMat.ucharPtr(y, x)[0] == MaskType.Background ||
+                    maskMat.ucharPtr(y, x)[0] == MaskType.ProbablyBackground
+                  ) {
+                    newResultImageData.data[i + 3] = 0;
+                  }
+
+                  i += 4;
+                }
+              }
+
+              setResultImageData(newResultImageData);
+
+              src.delete();
+              bgdModel.delete();
+              fgdModel.delete();
             }}
-          ></MaskEditor>
+          ></MaskEditorRenderer>
         )}
         <canvas ref={resultCanvasRef}></canvas>
       </div>
