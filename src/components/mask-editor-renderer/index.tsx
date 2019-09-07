@@ -39,6 +39,12 @@ const SetBrushFromMaskType = (maskEditor: MaskEditor, maskType: MaskType) => {
 
 type OnMaskChanged = (imageData: ImageData) => void;
 
+interface DrawingState {
+  IsDrawing: boolean;
+  LastX: number;
+  LastY: number;
+}
+
 interface Props {
   imageData: ImageData;
   targetMaskType: MaskType;
@@ -54,6 +60,11 @@ const MaskEditorRenderer = ({
   const maskCanvasRef = React.useRef<HTMLCanvasElement>(null);
 
   const [maskEditor, setMaskEditor] = useState<MaskEditor>();
+  const [drawingState, setDrawingState] = useState<DrawingState>({
+    IsDrawing: false,
+    LastX: 0,
+    LastY: 0
+  });
 
   useEffect(() => {
     InitializeCanvasFromImage(imageCanvasRef, imageData);
@@ -70,31 +81,27 @@ const MaskEditorRenderer = ({
     }
   }, [targetMaskType]);
 
-  let isDrawing = false;
-  let lastX = 0;
-  let lastY = 0;
   return (
     <div className={styles.rendererDiv}>
       <canvas className={styles.imageCanvas} ref={imageCanvasRef}></canvas>
       <canvas
         onPointerUp={evt => {
-          if (isDrawing) {
-            isDrawing = false;
+          if (drawingState.IsDrawing) {
             if (maskEditor && OnMaskChanged) {
               OnMaskChanged(maskEditor.GetData());
             }
+            setDrawingState({ ...drawingState, IsDrawing: false });
           }
         }}
         onPointerOut={evt => {
-          if (isDrawing) {
-            isDrawing = false;
+          if (drawingState.IsDrawing) {
             if (maskEditor && OnMaskChanged) {
               OnMaskChanged(maskEditor.GetData());
             }
+            setDrawingState({ ...drawingState, IsDrawing: false });
           }
         }}
         onPointerDown={evt => {
-          isDrawing = true;
           if (!maskEditor) return;
 
           const canvas = evt.currentTarget;
@@ -104,8 +111,11 @@ const MaskEditorRenderer = ({
 
           maskEditor.Draw(x, y);
 
-          lastX = x;
-          lastY = y;
+          setDrawingState({
+            IsDrawing: true,
+            LastX: x,
+            LastY: y
+          });
 
           const ctx = canvas.getContext('2d');
           if (!ctx) return;
@@ -113,7 +123,7 @@ const MaskEditorRenderer = ({
           maskEditor.DrawToContext(0, 0, ctx);
         }}
         onPointerMove={evt => {
-          if (!isDrawing) return;
+          if (!drawingState.IsDrawing) return;
           if (!maskEditor) return;
 
           const canvas = evt.currentTarget;
@@ -121,10 +131,13 @@ const MaskEditorRenderer = ({
           const x = evt.clientX - rect.left;
           const y = evt.clientY - rect.top;
 
-          maskEditor.DrawLine(lastX, lastY, x, y);
+          maskEditor.DrawLine(drawingState.LastX, drawingState.LastY, x, y);
 
-          lastX = x;
-          lastY = y;
+          setDrawingState({
+            IsDrawing: true,
+            LastX: x,
+            LastY: y
+          });
 
           const ctx = canvas.getContext('2d');
           if (!ctx) return;

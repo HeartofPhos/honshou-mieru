@@ -118,7 +118,7 @@ class GrabCutWorker {
 }
 
 let grabCutWorker: GrabCutWorker | null = null;
-ctx.addEventListener('message', evt => {
+ctx.addEventListener('message', (evt: any) => {
   switch (evt.data.action) {
     case 'initialize':
       {
