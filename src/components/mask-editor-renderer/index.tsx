@@ -1,6 +1,6 @@
 //@ts-ignore
 import React, { useEffect, useMemo, useState } from 'react';
-import { InitializeCanvasFromImage, MaskType } from '../../utility/misc';
+import { InitializeCanvasFromImage, MaskType } from '../../logic/misc';
 import styles from './styles.css';
 import MaskEditor from './mask-editor';
 

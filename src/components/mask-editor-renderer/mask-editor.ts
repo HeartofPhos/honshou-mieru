@@ -1,6 +1,11 @@
-import { Brush, CirclePixelBrush, CircleClearBrush } from './brush';
+import {
+  Brush,
+  CircleClearBrush,
+  CirclePixelBrush,
+  Drawable
+} from '../../logic/drawing';
 
-class MaskEditor {
+class MaskEditor implements Drawable {
   private maskCanvas: HTMLCanvasElement;
   private maskCtx: CanvasRenderingContext2D;
   private brush: Brush | null;

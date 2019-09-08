@@ -5,7 +5,7 @@ import {
   BuildImageData,
   InitializeCanvasFromImage,
   MaskType
-} from '../../utility/misc';
+} from '../../logic/misc';
 import styles from './styles.css';
 import MaskEditorRenderer from '../mask-editor-renderer';
 import GrabCutWorkerWrapper from './worker-wrapper';
