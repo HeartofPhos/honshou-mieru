@@ -2,13 +2,12 @@
   position: relative;
 }
 
-.imageCanvas {
-  position: relative;
+.baseCanvas {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
 
-.maskCanvas {
+.stackedCanvas {
   position: absolute;
   top: 0;
   left: 0;

@@ -13,7 +13,10 @@ export default class GrabCutWorkerWrapper {
 
   public constructor(
     imageData: ImageData,
-    resultCallback: (resultImageData: ImageData) => void
+    resultCallback: (
+      resultImageData: ImageData,
+      edgeImageData: ImageData
+    ) => void
   ) {
     this.grabCutWorker = new GrabCutWorker();
     this.waitingForResponse = false;
@@ -26,7 +29,7 @@ export default class GrabCutWorkerWrapper {
             this.grabCutWorker.postMessage(
               {
                 action: 'initialize',
-                buffer: imageData.data.buffer,
+                sourceBuffer: imageData.data.buffer,
                 width: imageData.width,
                 height: imageData.height
               },
@@ -38,7 +41,12 @@ export default class GrabCutWorkerWrapper {
           {
             resultCallback(
               new ImageData(
-                new Uint8ClampedArray(evt.data.buffer),
+                new Uint8ClampedArray(evt.data.resultBuffer),
+                evt.data.width,
+                evt.data.height
+              ),
+              new ImageData(
+                new Uint8ClampedArray(evt.data.edgeBuffer),
                 evt.data.width,
                 evt.data.height
               )
@@ -71,7 +79,7 @@ export default class GrabCutWorkerWrapper {
       this.grabCutWorker.postMessage(
         {
           action: 'mask-updated',
-          buffer: message.buffer,
+          maskBuffer: message.buffer,
           width: message.width,
           height: message.height
         },

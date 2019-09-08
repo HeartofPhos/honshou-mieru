@@ -16,9 +16,11 @@ interface Props {
 
 const Workspace = ({ imageArray }: Props) => {
   const resultCanvasRef = React.useRef<HTMLCanvasElement>(null);
+  const edgeCanvasRef = React.useRef<HTMLCanvasElement>(null);
 
   const [baseImageData, setBaseImageData] = useState<ImageData>();
   const [resultImageData, setResultImageData] = useState<ImageData>();
+  const [edgeImageData, setEdgeImageData] = useState<ImageData>();
   const [targetMaskType, setTargetMaskType] = useState<MaskType>(
     MaskType.Foreground
   );
@@ -32,8 +34,9 @@ const Workspace = ({ imageArray }: Props) => {
 
     let newWorker = new GrabCutWorkerWrapper(
       newBaseImageData,
-      resultImageData => {
+      (resultImageData, edgeImageData) => {
         setResultImageData(resultImageData);
+        setEdgeImageData(edgeImageData);
       }
     );
 
@@ -45,9 +48,15 @@ const Workspace = ({ imageArray }: Props) => {
   }, [imageArray]);
 
   useEffect(() => {
-    if (resultImageData)
+    if (resultImageData) {
       InitializeCanvasFromImage(resultCanvasRef, resultImageData);
+    }
   }, [resultImageData]);
+  useEffect(() => {
+    if (edgeImageData) {
+      InitializeCanvasFromImage(edgeCanvasRef, edgeImageData);
+    }
+  }, [edgeImageData]);
 
   return (
     <div>
@@ -77,8 +86,9 @@ const Workspace = ({ imageArray }: Props) => {
       <div className={styles.center}>
         {baseImageData && (
           <MaskEditorRenderer
-            imageData={baseImageData}
+            baseImageData={baseImageData}
             targetMaskType={targetMaskType}
+            edgeImageData={edgeImageData}
             OnMaskChanged={imageData => {
               if (!grabCutWorker) return;
               grabCutWorker.UpdateMask(imageData);

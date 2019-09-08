@@ -9,7 +9,8 @@ cv.onRuntimeInitialized = async () => {
 interface GrabCutOutput {
   width: number;
   height: number;
-  array: Uint8ClampedArray;
+  resultArray: Uint8ClampedArray;
+  edgeArray: Uint8ClampedArray;
 }
 
 class GrabCutWorker {
@@ -91,16 +92,48 @@ class GrabCutWorker {
     console.log(`GrabCut: ${gc}ms`);
 
     let orginalMatData = this.originalMat.data;
-    const outputImageData = new Uint8ClampedArray(orginalMatData.slice(0));
+    const resultArray = new Uint8ClampedArray(orginalMatData.slice(0));
+    const edgeArray = new Uint8ClampedArray(width * height * 4);
 
-    for (let x = 0; x < this.srcMat.cols; x++) {
-      for (let y = 0; y < this.srcMat.rows; y++) {
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
         let index = y * width * 4 + x * 4;
-        let maskIndex = y * width + x;
-        let maskValue = maskMatData[maskIndex];
+        let maskValue = maskMatData[y * width + x];
 
         if (maskValue == cv.GC_BGD || maskValue == cv.GC_PR_BGD) {
-          outputImageData[index + 3] = 0;
+          resultArray[index + 3] = 0;
+
+          let touching = false;
+          if (x > 0) {
+            let leftValue = maskMatData[y * width + (x - 1)];
+            if (leftValue == cv.GC_FGD || leftValue == cv.GC_PR_FGD) {
+              touching = true;
+            }
+          }
+          if (x < width - 1) {
+            let rightValue = maskMatData[y * width + (x + 1)];
+            if (rightValue == cv.GC_FGD || rightValue == cv.GC_PR_FGD) {
+              touching = true;
+            }
+          }
+          if (y > 0) {
+            let topValue = maskMatData[(y - 1) * width + x];
+            if (topValue == cv.GC_FGD || topValue == cv.GC_PR_FGD) {
+              touching = true;
+            }
+          }
+          if (y < height - 1) {
+            let bottomValue = maskMatData[(y + 1) * width + x];
+            if (bottomValue == cv.GC_FGD || bottomValue == cv.GC_PR_FGD) {
+              touching = true;
+            }
+          }
+
+          if (touching) {
+            edgeArray[index + 0] = 255;
+            edgeArray[index + 1] = 255;
+            edgeArray[index + 3] = 255;
+          }
         }
       }
     }
@@ -110,9 +143,10 @@ class GrabCutWorker {
 
     console.log(`Delta: ${t - gc}ms`);
     return {
-      width: this.srcMat.cols,
-      height: this.srcMat.rows,
-      array: outputImageData
+      width: width,
+      height: height,
+      resultArray: resultArray,
+      edgeArray: edgeArray
     };
   }
 }
@@ -124,7 +158,7 @@ ctx.addEventListener('message', (evt: any) => {
       {
         if (grabCutWorker == null) {
           grabCutWorker = new GrabCutWorker(
-            evt.data.buffer,
+            evt.data.sourceBuffer,
             evt.data.width,
             evt.data.height
           );
@@ -135,7 +169,7 @@ ctx.addEventListener('message', (evt: any) => {
       {
         if (grabCutWorker != null) {
           const result = grabCutWorker.GrabCut(
-            evt.data.buffer,
+            evt.data.maskBuffer,
             evt.data.width,
             evt.data.height
           );
@@ -143,11 +177,12 @@ ctx.addEventListener('message', (evt: any) => {
           ctx.postMessage(
             {
               action: 'result-updated',
-              buffer: result.array.buffer,
+              resultBuffer: result.resultArray.buffer,
+              edgeBuffer: result.edgeArray.buffer,
               width: result.width,
               height: result.height
             },
-            [result.array.buffer]
+            [result.resultArray.buffer, result.edgeArray.buffer]
           );
         }
       }
