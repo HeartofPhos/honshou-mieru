@@ -30,19 +30,19 @@ class MaskEditor implements Drawable {
     }
   }
 
-  public Draw(x: number, y: number) {
+  public DrawMask(x: number, y: number) {
     if (!this.brush) return;
 
-    this.brush.DrawBrush(x, y, this.maskCtx);
+    this.brush.Draw(x, y, this.maskCtx);
   }
 
-  public DrawLine(x0: number, y0: number, x1: number, y1: number) {
+  public DrawMaskLine(x0: number, y0: number, x1: number, y1: number) {
     if (!this.brush) return;
 
-    this.brush.DrawBrushLine(x0, y0, x1, y1, this.maskCtx);
+    this.brush.DrawLine(x0, y0, x1, y1, this.maskCtx);
   }
 
-  public DrawToContext(x: number, y: number, target: CanvasRenderingContext2D) {
+  public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
     target.drawImage(this.maskCanvas, x, y);
   }
 

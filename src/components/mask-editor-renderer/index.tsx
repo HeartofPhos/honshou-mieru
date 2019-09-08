@@ -125,7 +125,7 @@ const MaskEditorRenderer = ({
         const x = evt.clientX - rect.left;
         const y = evt.clientY - rect.top;
 
-        maskEditor.Draw(x, y);
+        maskEditor.DrawMask(x, y);
 
         setDrawingState({
           IsDrawing: true,
@@ -136,7 +136,7 @@ const MaskEditorRenderer = ({
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        maskEditor.DrawToContext(0, 0, ctx);
+        maskEditor.Draw(0, 0, ctx);
       }}
       onPointerMove={evt => {
         if (!drawingState.IsDrawing) return;
@@ -148,7 +148,7 @@ const MaskEditorRenderer = ({
         const x = evt.clientX - rect.left;
         const y = evt.clientY - rect.top;
 
-        maskEditor.DrawLine(drawingState.LastX, drawingState.LastY, x, y);
+        maskEditor.DrawMaskLine(drawingState.LastX, drawingState.LastY, x, y);
 
         setDrawingState({
           IsDrawing: true,
@@ -159,7 +159,7 @@ const MaskEditorRenderer = ({
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        maskEditor.DrawToContext(0, 0, ctx);
+        maskEditor.Draw(0, 0, ctx);
       }}
     >
       <canvas className={styles.baseCanvas} ref={baseCanvasRef}></canvas>

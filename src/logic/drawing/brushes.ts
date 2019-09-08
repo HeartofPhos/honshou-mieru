@@ -1,3 +1,5 @@
+import { Drawable } from '.';
+
 const StepDrawBresenhamLine = (
   x0: number,
   y0: number,
@@ -79,9 +81,8 @@ const DrawCircle = (
   }
 };
 
-export interface Brush {
-  DrawBrush(x: number, y: number, target: CanvasRenderingContext2D): void;
-  DrawBrushLine(
+export interface Brush extends Drawable {
+  DrawLine(
     x0: number,
     y0: number,
     x1: number,
@@ -113,7 +114,7 @@ export class CircleClearBrush implements Brush {
     }
   }
 
-  public DrawBrush(x: number, y: number, target: CanvasRenderingContext2D) {
+  public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
     target.globalCompositeOperation = 'destination-out';
     target.drawImage(
       this.outCanvas,
@@ -122,7 +123,7 @@ export class CircleClearBrush implements Brush {
     );
   }
 
-  public DrawBrushLine(
+  public DrawLine(
     x0: number,
     y0: number,
     x1: number,
@@ -133,9 +134,7 @@ export class CircleClearBrush implements Brush {
     y0 = Math.floor(y0);
     x1 = Math.floor(x1);
     y1 = Math.floor(y1);
-    StepDrawBresenhamLine(x0, y0, x1, y1, (x, y) =>
-      this.DrawBrush(x, y, target)
-    );
+    StepDrawBresenhamLine(x0, y0, x1, y1, (x, y) => this.Draw(x, y, target));
   }
 }
 
@@ -164,8 +163,8 @@ export class CirclePixelBrush implements Brush {
     }
   }
 
-  public DrawBrush(x: number, y: number, target: CanvasRenderingContext2D) {
-    this.clearBrush.DrawBrush(x, y, target);
+  public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
+    this.clearBrush.Draw(x, y, target);
 
     target.globalCompositeOperation = 'source-over';
     target.drawImage(
@@ -175,7 +174,7 @@ export class CirclePixelBrush implements Brush {
     );
   }
 
-  public DrawBrushLine(
+  public DrawLine(
     x0: number,
     y0: number,
     x1: number,
@@ -186,8 +185,6 @@ export class CirclePixelBrush implements Brush {
     y0 = Math.floor(y0);
     x1 = Math.floor(x1);
     y1 = Math.floor(y1);
-    StepDrawBresenhamLine(x0, y0, x1, y1, (x, y) =>
-      this.DrawBrush(x, y, target)
-    );
+    StepDrawBresenhamLine(x0, y0, x1, y1, (x, y) => this.Draw(x, y, target));
   }
 }
