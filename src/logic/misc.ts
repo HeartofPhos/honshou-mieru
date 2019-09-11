@@ -1,5 +1,6 @@
 import React from 'react';
 import ndarray = require('ndarray');
+import { Drawable } from './drawing';
 
 export const BuildImageData = (imageArray: ndarray): ImageData => {
   const imageData = new ImageData(imageArray.shape[0], imageArray.shape[1]);
@@ -18,18 +19,17 @@ export const BuildImageData = (imageArray: ndarray): ImageData => {
   return imageData;
 };
 
-export const InitializeCanvasFromImage = (
-  imageCanvasRef: React.RefObject<HTMLCanvasElement>,
-  imageData: ImageData
+export const Redraw = (
+  canvasRef: React.RefObject<HTMLCanvasElement>,
+  drawable: Drawable
 ) => {
-  const canvas = imageCanvasRef.current;
+  const canvas = canvasRef.current;
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  canvas.height = imageData.height;
-  canvas.width = imageData.width;
-  ctx.putImageData(imageData, 0, 0);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawable.Draw(0, 0, ctx);
 };
 
 export enum MaskType {

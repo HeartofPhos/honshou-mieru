@@ -1,42 +1,69 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import ndarray = require('ndarray');
 
-import {
-  BuildImageData,
-  InitializeCanvasFromImage,
-  MaskType
-} from '../../logic/misc';
+import { BuildImageData, MaskType, Redraw } from '../../logic/misc';
 import styles from './styles.css';
 import MaskEditorRenderer from '../mask-editor-renderer';
-import GrabCutWorkerWrapper from './worker-wrapper';
+import GrabCutWorkerWrapper from './worker/worker-wrapper';
+import { CachedImage } from '../../logic/drawing';
+import { CanvasSize, ResizeCanvas } from '../../logic/canvas-resize';
 
 interface Props {
   imageArray: ndarray;
 }
 
+const CalculateCanvasSize = (
+  canvasRef: React.RefObject<HTMLCanvasElement>
+): CanvasSize => {
+  let hOffset = 0;
+  if (canvasRef.current) {
+    hOffset = canvasRef.current.offsetTop;
+  }
+  return {
+    width: document.body.clientWidth / 2,
+    height: document.body.clientHeight - hOffset
+  };
+};
+
 const Workspace = ({ imageArray }: Props) => {
   const resultCanvasRef = React.useRef<HTMLCanvasElement>(null);
-  const edgeCanvasRef = React.useRef<HTMLCanvasElement>(null);
 
-  const [baseImageData, setBaseImageData] = useState<ImageData>();
-  const [resultImageData, setResultImageData] = useState<ImageData>();
-  const [edgeImageData, setEdgeImageData] = useState<ImageData>();
+  const [baseImage, setBaseImage] = useState<CachedImage>();
+  const [resultImage, setResultImage] = useState<CachedImage>();
+  const [edgeImage, setEdgeImage] = useState<CachedImage>();
   const [targetMaskType, setTargetMaskType] = useState<MaskType>(
     MaskType.Foreground
   );
-
   const [grabCutWorker, setGrabCutWorker] = useState<GrabCutWorkerWrapper>();
+  const [canvasSize, setCanvasSize] = useState<CanvasSize>({
+    width: 0,
+    height: 0
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setCanvasSize(CalculateCanvasSize(resultCanvasRef));
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  useEffect(() => {
+    setCanvasSize(CalculateCanvasSize(resultCanvasRef));
+  }, [resultCanvasRef]);
 
   useEffect(() => {
     const newBaseImageData = BuildImageData(imageArray);
-    setBaseImageData(newBaseImageData);
-    setResultImageData(newBaseImageData);
+    setBaseImage(new CachedImage(newBaseImageData));
+    setResultImage(new CachedImage(newBaseImageData));
 
     let newWorker = new GrabCutWorkerWrapper(
       newBaseImageData,
       (resultImageData, edgeImageData) => {
-        setResultImageData(resultImageData);
-        setEdgeImageData(edgeImageData);
+        setResultImage(new CachedImage(resultImageData));
+        setEdgeImage(new CachedImage(edgeImageData));
       }
     );
 
@@ -48,15 +75,19 @@ const Workspace = ({ imageArray }: Props) => {
   }, [imageArray]);
 
   useEffect(() => {
-    if (resultImageData) {
-      InitializeCanvasFromImage(resultCanvasRef, resultImageData);
+    if (resultImage) {
+      Redraw(resultCanvasRef, resultImage);
     }
-  }, [resultImageData]);
+  }, [resultImage]);
+
   useEffect(() => {
-    if (edgeImageData) {
-      InitializeCanvasFromImage(edgeCanvasRef, edgeImageData);
+    ResizeCanvas(canvasSize, resultCanvasRef);
+    if (resultImage) {
+      Redraw(resultCanvasRef, resultImage);
+    } else if (baseImage) {
+      Redraw(resultCanvasRef, baseImage);
     }
-  }, [edgeImageData]);
+  }, [canvasSize]);
 
   return (
     <div>
@@ -84,15 +115,16 @@ const Workspace = ({ imageArray }: Props) => {
         </button>
       </div>
       <div className={styles.center}>
-        {baseImageData && (
+        {baseImage && (
           <MaskEditorRenderer
-            baseImageData={baseImageData}
+            baseImage={baseImage}
+            edgeImage={edgeImage}
             targetMaskType={targetMaskType}
-            edgeImageData={edgeImageData}
-            OnMaskChanged={imageData => {
+            onMaskChanged={imageData => {
               if (!grabCutWorker) return;
               grabCutWorker.UpdateMask(imageData);
             }}
+            canvasSize={canvasSize}
           ></MaskEditorRenderer>
         )}
         <canvas ref={resultCanvasRef}></canvas>

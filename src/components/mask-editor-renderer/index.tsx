@@ -1,20 +1,10 @@
 //@ts-ignore
 import React, { useEffect, useMemo, useState } from 'react';
-import { InitializeCanvasFromImage, MaskType } from '../../logic/misc';
+import { Redraw, MaskType } from '../../logic/misc';
 import styles from './styles.css';
 import MaskEditor from './mask-editor';
-
-const InitializeMaskCanvas = (
-  maskCanvasRef: React.RefObject<HTMLCanvasElement>,
-  width: number,
-  height: number
-) => {
-  const canvas = maskCanvasRef.current;
-  if (!canvas) return;
-
-  canvas.width = width;
-  canvas.height = height;
-};
+import { CachedImage } from '../../logic/drawing';
+import { CanvasSize, ResizeCanvas } from '../../logic/canvas-resize';
 
 const SetBrushFromMaskType = (maskEditor: MaskEditor, maskType: MaskType) => {
   const size = 10;
@@ -46,17 +36,19 @@ interface DrawingState {
 }
 
 interface Props {
-  baseImageData: ImageData;
-  edgeImageData?: ImageData;
+  baseImage: CachedImage;
+  edgeImage?: CachedImage;
   targetMaskType: MaskType;
-  OnMaskChanged?: OnMaskChanged;
+  onMaskChanged?: OnMaskChanged;
+  canvasSize: CanvasSize;
 }
 
 const MaskEditorRenderer = ({
-  baseImageData,
-  edgeImageData,
+  baseImage,
+  edgeImage,
   targetMaskType,
-  OnMaskChanged
+  onMaskChanged,
+  canvasSize
 }: Props) => {
   const baseCanvasRef = React.useRef<HTMLCanvasElement>(null);
   const maskCanvasRef = React.useRef<HTMLCanvasElement>(null);
@@ -70,26 +62,31 @@ const MaskEditorRenderer = ({
   });
 
   useEffect(() => {
-    InitializeCanvasFromImage(baseCanvasRef, baseImageData);
-    InitializeMaskCanvas(
-      maskCanvasRef,
-      baseImageData.width,
-      baseImageData.height
-    );
+    Redraw(baseCanvasRef, baseImage);
 
-    const newMaskEditor = new MaskEditor(
-      baseImageData.width,
-      baseImageData.height
-    );
+    const newMaskEditor = new MaskEditor(baseImage.width, baseImage.height);
     SetBrushFromMaskType(newMaskEditor, targetMaskType);
     setMaskEditor(newMaskEditor);
-  }, [baseImageData]);
+  }, [baseImage]);
 
   useEffect(() => {
-    if (edgeImageData) {
-      InitializeCanvasFromImage(edgeCanvasRef, edgeImageData);
+    if (edgeImage) {
+      Redraw(edgeCanvasRef, edgeImage);
     }
-  }, [edgeImageData]);
+  }, [edgeImage]);
+
+  useEffect(() => {
+    ResizeCanvas(canvasSize, baseCanvasRef);
+    ResizeCanvas(canvasSize, maskCanvasRef);
+    ResizeCanvas(canvasSize, edgeCanvasRef);
+    Redraw(baseCanvasRef, baseImage);
+    if (maskEditor) {
+      Redraw(maskCanvasRef, maskEditor);
+    }
+    if (edgeImage) {
+      Redraw(edgeCanvasRef, edgeImage);
+    }
+  }, [canvasSize]);
 
   useMemo(() => {
     if (maskEditor) {
@@ -100,18 +97,18 @@ const MaskEditorRenderer = ({
   return (
     <div
       className={styles.rendererDiv}
-      onPointerUp={evt => {
+      onPointerUp={() => {
         if (drawingState.IsDrawing) {
-          if (maskEditor && OnMaskChanged) {
-            OnMaskChanged(maskEditor.GetData());
+          if (maskEditor && onMaskChanged) {
+            onMaskChanged(maskEditor.GetData());
           }
           setDrawingState({ ...drawingState, IsDrawing: false });
         }
       }}
-      onPointerOut={evt => {
+      onPointerOut={() => {
         if (drawingState.IsDrawing) {
-          if (maskEditor && OnMaskChanged) {
-            OnMaskChanged(maskEditor.GetData());
+          if (maskEditor && onMaskChanged) {
+            onMaskChanged(maskEditor.GetData());
           }
           setDrawingState({ ...drawingState, IsDrawing: false });
         }
