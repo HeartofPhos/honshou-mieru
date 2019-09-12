@@ -83,16 +83,70 @@ const Sharpen = (
   blur.delete();
 };
 
+const KMeans = (
+  target: any,
+  clusterCount: number,
+  epsilon: number,
+  maxIterations: number,
+  attempts: number
+) => {
+  const targetData = target.data;
+  const sample = new cv.Mat(target.rows * target.cols, 3, cv.CV_32F);
+  const sampleData = sample.data32F;
+
+  for (let y = 0; y < target.rows; y++) {
+    for (let x = 0; x < target.cols; x++) {
+      const targetIndex = y * target.cols * 3 + x * 3;
+      const sampleIndex = x * target.rows * 3 + y * 3;
+
+      sampleData[sampleIndex] = targetData[targetIndex];
+      sampleData[sampleIndex + 1] = targetData[targetIndex + 1];
+      sampleData[sampleIndex + 2] = targetData[targetIndex + 2];
+    }
+  }
+
+  const labels = new cv.Mat();
+  const criteria = new cv.TermCriteria(
+    cv.TermCriteria_EPS + cv.TermCriteria_MAX_ITER,
+    maxIterations,
+    epsilon
+  );
+  const centers = new cv.Mat();
+
+  cv.kmeans(
+    sample,
+    clusterCount,
+    labels,
+    criteria,
+    attempts,
+    cv.KMEANS_RANDOM_CENTERS,
+    centers
+  );
+
+  const labelsData = labels.data32S;
+  const centersData = centers.data32F;
+  for (let y = 0; y < target.rows; y++) {
+    for (let x = 0; x < target.cols; x++) {
+      const targetIndex = y * target.cols * 3 + x * 3;
+      const labelsIndex = y + x * target.rows;
+      const centersIndex = labelsData[labelsIndex] * centers.cols;
+
+      targetData[targetIndex + 0] = centersData[centersIndex + 0];
+      targetData[targetIndex + 1] = centersData[centersIndex + 1];
+      targetData[targetIndex + 2] = centersData[centersIndex + 2];
+      // targetData[targetIndex + 3] = 255;
+    }
+  }
+  sample.delete();
+  labels.delete();
+  centers.delete();
+};
+
 export const InitializeSource = (original: any) => {
   const output = new cv.Mat();
   cv.cvtColor(original, output, cv.COLOR_RGBA2RGB, 0);
 
-  BilateralFilter(output, 3, 50, 10);
-  Sharpen(output, 11, 50, 0.5, 200);
-  ApplyToLightPlane(output, lightPlane => {
-    CLAHE(lightPlane, 100, 5);
-  });
-  BilateralFilter(output, 3, 50, 10);
+  KMeans(output, 20, 0.0001, 10000, 1);
 
   return output;
 };
