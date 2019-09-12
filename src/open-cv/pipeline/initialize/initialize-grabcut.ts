@@ -1,5 +1,5 @@
 import { cv } from '../../open-cv-wrapper';
-import { PipelineState, GrabCutState } from '..';
+import { GrabCutState } from '..';
 
 export const InitializeGrabCut = (
   width: number,

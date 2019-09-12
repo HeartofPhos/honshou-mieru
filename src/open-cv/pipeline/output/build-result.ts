@@ -1,7 +1,7 @@
 import { cv } from '../../open-cv-wrapper';
-import { PipelineState, SegmentOutput } from '..';
+import { SegmentState, SegmentOutput } from '..';
 
-const BuildEdges = (state: PipelineState) => {
+const BuildEdges = (state: SegmentState) => {
   const edgeMat = cv.Mat.zeros(state.Height, state.Width, cv.CV_8UC4);
   const contours = new cv.MatVector();
   const hierarchy = new cv.Mat();
@@ -36,13 +36,8 @@ const BuildEdges = (state: PipelineState) => {
   return output;
 };
 
-export const BuildResult = (state: PipelineState): SegmentOutput => {
+export const BuildResult = (state: SegmentState): SegmentOutput => {
   const orginalMatData = state.Original.data;
-
-  const ksize = new cv.Size(3, 3);
-  const M = cv.getStructuringElement(cv.MORPH_ELLIPSE, ksize);
-  cv.morphologyEx(state.OutputMask, state.OutputMask, cv.MORPH_CLOSE, M);
-  M.delete();
 
   const output = {
     resultArray: new Uint8ClampedArray(orginalMatData.slice(0)),

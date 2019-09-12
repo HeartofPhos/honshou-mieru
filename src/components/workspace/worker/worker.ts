@@ -1,6 +1,6 @@
 import { cv } from '../../../open-cv/open-cv-wrapper';
 import {
-  PipelineState,
+  SegmentState,
   InitializeState,
   Segement,
   Dispose
@@ -11,7 +11,7 @@ cv.onRuntimeInitialized = async () => {
   ctx.postMessage({ action: 'ready' });
 };
 
-let state: PipelineState | null;
+let state: SegmentState | null;
 ctx.addEventListener('message', (evt: any) => {
   switch (evt.data.action) {
     case 'initialize':

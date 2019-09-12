@@ -1,10 +1,11 @@
 import { cv } from '../open-cv-wrapper';
-import { InitializeGrabCut } from './actions/initialize-grabcut';
-import { InitializeSource } from './actions/initialize-source';
-import { PrepareMask } from './actions/prepare-mask';
-import { GrabCut } from './actions/grabcut';
-import { InterpretMask } from './actions/interpret-mask';
-import { BuildResult } from './actions/build-result';
+import { InitializeGrabCut } from './initialize/initialize-grabcut';
+import { InitializeSource } from './initialize/initialize-source';
+import { PrepareMask } from './process/prepare-mask';
+import { GrabCut } from './process/grabcut';
+import { InterpretGrabcut } from './process/interpret-grabcut';
+import { BuildResult } from './output/build-result';
+import { CloseGaps } from './process/close-gaps';
 
 export interface GrabCutState {
   Mask: any;
@@ -12,7 +13,7 @@ export interface GrabCutState {
   ForegroundModel: any;
 }
 
-export interface PipelineState {
+export interface SegmentState {
   Width: number;
   Height: number;
   RunCount: number;
@@ -32,7 +33,7 @@ export const InitializeState = (
   originalImageBuffer: ArrayBuffer,
   width: number,
   height: number
-): PipelineState => {
+): SegmentState => {
   const originalMat = cv.matFromImageData(
     new ImageData(new Uint8ClampedArray(originalImageBuffer), width, height)
   );
@@ -49,12 +50,13 @@ export const InitializeState = (
 };
 
 export const Segement = (
-  state: PipelineState,
+  state: SegmentState,
   maskImageBuffer: ArrayBuffer
 ): SegmentOutput => {
   PrepareMask(state, maskImageBuffer);
   GrabCut(state);
-  InterpretMask(state);
+  InterpretGrabcut(state);
+  CloseGaps(state);
   const output = BuildResult(state);
 
   state.RunCount++;
@@ -62,7 +64,7 @@ export const Segement = (
   return output;
 };
 
-export const Dispose = (state: PipelineState) => {
+export const Dispose = (state: SegmentState) => {
   state.Original.delete();
   state.Source.delete();
   state.OutputMask.delete();

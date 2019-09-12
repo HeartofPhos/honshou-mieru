@@ -1,5 +1,5 @@
 import { cv } from '../../open-cv-wrapper';
-import { PipelineState } from '..';
+import { SegmentState } from '..';
 
 const InterpretPair = (target: any, areaType: number, targetType: number) => {
   const targetData = target.data;
@@ -64,31 +64,18 @@ const InterpretPair = (target: any, areaType: number, targetType: number) => {
   return output;
 };
 
-export const InterpretMask = (state: PipelineState) => {
-  const maskMatData = state.GrabCut.Mask.data;
-
+const CloseUnmarkedSections = (state: SegmentState) => {
   const outputMaskData = state.OutputMask.data;
-  for (let x = 0; x < state.Width; x++) {
-    for (let y = 0; y < state.Height; y++) {
-      const maskIndex = y * state.Width + x;
-      const maskValue = maskMatData[maskIndex];
-      if (maskValue == cv.GC_BGD || maskValue == cv.GC_PR_BGD) {
-        outputMaskData[maskIndex] = 0;
-      } else {
-        outputMaskData[maskIndex] = 255;
-      }
-    }
-  }
-
   const clonedMaskMat = state.GrabCut.Mask.clone();
   const clonedMaskMatData = clonedMaskMat.data;
+
   const bgdResult = InterpretPair(clonedMaskMat, cv.GC_PR_BGD, cv.GC_BGD);
   const bgdResultData = bgdResult.data;
   for (let x = 0; x < state.Width; x++) {
     for (let y = 0; y < state.Height; y++) {
       const maskIndex = y * state.Width + x;
       if (bgdResultData[maskIndex] == 1) {
-        if (maskMatData[maskIndex] == cv.GC_PR_BGD) {
+        if (clonedMaskMatData[maskIndex] == cv.GC_PR_BGD) {
           clonedMaskMatData[maskIndex] = cv.GC_PR_FGD;
         }
         outputMaskData[maskIndex] = 255;
@@ -110,4 +97,16 @@ export const InterpretMask = (state: PipelineState) => {
   bgdResult.delete();
   fgdResult.delete();
   clonedMaskMat.delete();
+};
+
+const MorphClose = (state: SegmentState) => {
+  const ksize = new cv.Size(3, 3);
+  const M = cv.getStructuringElement(cv.MORPH_ELLIPSE, ksize);
+  cv.morphologyEx(state.OutputMask, state.OutputMask, cv.MORPH_CLOSE, M);
+  M.delete();
+};
+
+export const CloseGaps = (state: SegmentState) => {
+  CloseUnmarkedSections(state);
+  MorphClose(state);
 };

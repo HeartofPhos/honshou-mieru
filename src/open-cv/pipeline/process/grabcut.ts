@@ -1,7 +1,7 @@
 import { cv } from '../../open-cv-wrapper';
-import { PipelineState } from '..';
+import { SegmentState } from '..';
 
-export const GrabCut = (state: PipelineState) => {
+export const GrabCut = (state: SegmentState) => {
   try {
     const rect = new cv.Rect(0, 0, state.Width, state.Height);
     cv.grabCut(

@@ -1,5 +1,4 @@
 import { cv } from '../../open-cv-wrapper';
-import { PipelineState } from '..';
 
 export const applyToPlanes = (target: any, f: (planes: any) => void) => {
   const tempPlanes = new cv.MatVector();

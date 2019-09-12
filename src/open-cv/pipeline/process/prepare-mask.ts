@@ -1,8 +1,8 @@
 import { cv } from '../../open-cv-wrapper';
-import { PipelineState } from '..';
+import { SegmentState } from '..';
 
 export const PrepareMask = (
-  state: PipelineState,
+  state: SegmentState,
   maskImageBuffer: ArrayBuffer
 ) => {
   const maskMatData = state.GrabCut.Mask.data;
