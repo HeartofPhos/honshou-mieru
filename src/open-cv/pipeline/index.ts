@@ -4,7 +4,7 @@ import { InitializeSource } from './initialize/initialize-source';
 import { PrepareMask } from './process/prepare-mask';
 import { GrabCut } from './process/grabcut';
 import { InterpretGrabcut } from './process/interpret-grabcut';
-import { BuildResult } from './output/build-result';
+import { BuildOutput } from './output/build-result';
 import { CloseGaps } from './process/close-gaps';
 
 export interface GrabCutState {
@@ -57,7 +57,7 @@ export const Segement = (
   GrabCut(state);
   InterpretGrabcut(state);
   CloseGaps(state);
-  const output = BuildResult(state);
+  const output = BuildOutput(state);
 
   state.RunCount++;
 

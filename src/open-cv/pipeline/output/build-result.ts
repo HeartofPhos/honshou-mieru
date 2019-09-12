@@ -36,7 +36,7 @@ const BuildEdges = (state: SegmentState) => {
   return output;
 };
 
-export const BuildResult = (state: SegmentState): SegmentOutput => {
+export const BuildOutput = (state: SegmentState): SegmentOutput => {
   const orginalMatData = state.Original.data;
 
   const output = {
