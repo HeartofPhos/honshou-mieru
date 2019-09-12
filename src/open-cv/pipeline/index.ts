@@ -1,7 +1,7 @@
 import { cv } from '../open-cv-wrapper';
 import { InitializeGrabCut } from './initialize/initialize-grabcut';
 import { InitializeSource } from './initialize/initialize-source';
-import { PrepareMask } from './process/prepare-mask';
+import { PrepareGrabcutMask } from './process/prepare-grabcut-mask';
 import { GrabCut } from './process/grabcut';
 import { InterpretGrabcut } from './process/interpret-grabcut';
 import { BuildOutput } from './output/build-result';
@@ -53,7 +53,7 @@ export const Segement = (
   state: SegmentState,
   maskImageBuffer: ArrayBuffer
 ): SegmentOutput => {
-  PrepareMask(state, maskImageBuffer);
+  PrepareGrabcutMask(state, maskImageBuffer);
   GrabCut(state);
   InterpretGrabcut(state);
   CloseGaps(state);

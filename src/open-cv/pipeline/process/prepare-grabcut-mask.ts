@@ -1,7 +1,7 @@
 import { cv } from '../../open-cv-wrapper';
 import { SegmentState } from '..';
 
-export const PrepareMask = (
+export const PrepareGrabcutMask = (
   state: SegmentState,
   maskImageBuffer: ArrayBuffer
 ) => {
