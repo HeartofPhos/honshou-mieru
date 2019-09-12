@@ -119,7 +119,7 @@ const KMeans = (
     labels,
     criteria,
     attempts,
-    cv.KMEANS_RANDOM_CENTERS,
+    cv.KMEANS_PP_CENTERS,
     centers
   );
 
@@ -146,7 +146,7 @@ export const InitializeSource = (original: any) => {
   const output = new cv.Mat();
   cv.cvtColor(original, output, cv.COLOR_RGBA2RGB, 0);
 
-  KMeans(output, 20, 0.0001, 10000, 1);
+  KMeans(output, 15, 0.0001, 10000, 1);
 
   return output;
 };

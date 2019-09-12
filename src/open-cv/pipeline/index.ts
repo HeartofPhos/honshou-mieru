@@ -56,7 +56,7 @@ export const Segement = (
   PrepareGrabcutMask(state, maskImageBuffer);
   GrabCut(state);
   InterpretGrabcut(state);
-  CloseGaps(state);
+  // CloseGaps(state);
   const output = BuildOutput(state);
 
   state.RunCount++;
