@@ -61,7 +61,7 @@ const InterpretPair = (target: any, areaType: number, targetType: number) => {
 
 const CloseUnmarkedSections = (state: SegmentState) => {
   const outputMaskData = state.OutputMask.data;
-  const clonedMaskMat = state.GrabCut.Mask.clone();
+  const clonedMaskMat = state.GrabCut.Mask;
   const clonedMaskMatData = clonedMaskMat.data;
 
   const bgdResult = InterpretPair(clonedMaskMat, cv.GC_PR_BGD, cv.GC_BGD);
@@ -79,13 +79,16 @@ const CloseUnmarkedSections = (state: SegmentState) => {
   const fgdResultData = fgdResult.data;
   for (let i = 0; i < fgdResultData.length; i++) {
     if (fgdResultData[i] == 1) {
+      if (clonedMaskMatData[i] == cv.GC_PR_FGD) {
+        clonedMaskMatData[i] = cv.GC_PR_BGD;
+      }
       outputMaskData[i] = 0;
     }
   }
 
   bgdResult.delete();
   fgdResult.delete();
-  clonedMaskMat.delete();
+  // clonedMaskMat.delete();
 };
 
 const MorphClose = (state: SegmentState) => {

@@ -21,14 +21,7 @@ export const PrepareGrabcutMask = (
         maskMatData[maskIndex] = cv.GC_FGD;
       } else if (data[index + 3] == 0) {
         //Alpha == 0
-
-        if (maskMatData[maskIndex] == cv.GC_FGD) {
-          maskMatData[maskIndex] = cv.GC_PR_FGD;
-        } else if (maskMatData[maskIndex] == cv.GC_BGD) {
-          maskMatData[maskIndex] = cv.GC_PR_BGD;
-        } else {
-          // maskMatData[maskIndex] = cv.GC_PR_BGD;
-        }
+        maskMatData[maskIndex] = cv.GC_PR_FGD;
       }
     }
   }

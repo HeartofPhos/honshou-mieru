@@ -1,6 +1,6 @@
 import { cv } from '../../open-cv-wrapper';
 
-export const applyToPlanes = (target: any, f: (planes: any) => void) => {
+const ApplyToPlanes = (target: any, f: (planes: any) => void) => {
   const tempPlanes = new cv.MatVector();
   cv.split(target, tempPlanes);
 
@@ -13,7 +13,7 @@ export const applyToPlanes = (target: any, f: (planes: any) => void) => {
 
 const ApplyToLightPlane = (target: any, f: (lightPlane: any) => void) => {
   cv.cvtColor(target, target, cv.COLOR_RGB2Lab, 0);
-  applyToPlanes(target, planes => {
+  ApplyToPlanes(target, planes => {
     f(planes.get(0));
   });
   cv.cvtColor(target, target, cv.COLOR_Lab2RGB, 0);
@@ -146,7 +146,12 @@ export const InitializeSource = (original: any) => {
   const output = new cv.Mat();
   cv.cvtColor(original, output, cv.COLOR_RGBA2RGB, 0);
 
-  KMeans(output, 15, 0.0001, 10000, 1);
+  ApplyToLightPlane(output, lightPlane => {
+    CLAHE(lightPlane, 4, 16);
+  });
+  Sharpen(output, 11, 150, 0.5, 255);
+  KMeans(output, 16, 0.0001, 10000, 1);
+  BilateralFilter(output, 5, 50, 10);
 
   return output;
 };

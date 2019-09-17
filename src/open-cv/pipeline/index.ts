@@ -38,7 +38,8 @@ export const InitializeState = (
     new ImageData(new Uint8ClampedArray(originalImageBuffer), width, height)
   );
 
-  return {
+  const t0 = performance.now();
+  const output = {
     Width: width,
     Height: height,
     RunCount: 0,
@@ -47,17 +48,24 @@ export const InitializeState = (
     OutputMask: new cv.Mat(height, width, cv.CV_8UC1),
     GrabCut: InitializeGrabCut(width, height)
   };
+  const t1 = performance.now();
+  console.log(`InitializeState: ${t1 - t0}ms`);
+
+  return output;
 };
 
 export const Segement = (
   state: SegmentState,
   maskImageBuffer: ArrayBuffer
 ): SegmentOutput => {
+  const t0 = performance.now();
   PrepareGrabcutMask(state, maskImageBuffer);
   GrabCut(state);
   InterpretGrabcut(state);
-  // CloseGaps(state);
+  CloseGaps(state);
   const output = BuildOutput(state);
+  const t1 = performance.now();
+  console.log(`Segment: ${t1 - t0}ms`);
 
   state.RunCount++;
 
