@@ -48,6 +48,7 @@ class ExtendedCanvas extends React.Component<Props> {
   public Draw() {
     const ctx = GetContext(this.canvasRef);
     if (!ctx) return;
+    ctx.imageSmoothingEnabled = false;
 
     ctx.save();
     ctx.resetTransform();
