@@ -4,7 +4,6 @@
 
 .baseCanvas {
   image-rendering: pixelated;
-  image-rendering: crisp-edges;
 }
 
 .stackedCanvas {
@@ -12,5 +11,4 @@
   top: 0;
   left: 0;
   image-rendering: pixelated;
-  image-rendering: crisp-edges;
 }

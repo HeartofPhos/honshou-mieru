@@ -1,23 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import ndarray = require('ndarray');
 
-import { BuildImageData, MaskType, Redraw } from '../../logic/misc';
+import { BuildImageData, MaskType } from '../../logic/misc';
 import styles from './styles.css';
 import MaskEditorRenderer from '../mask-editor-renderer';
 import GrabCutWorkerWrapper from './worker/worker-wrapper';
 import { CachedImage } from '../../logic/drawing';
-import { CanvasSize, ResizeCanvas } from '../../logic/canvas-resize';
+import ExtendedCanvas, {
+  CanvasPosition,
+  CanvasScale,
+  CanvasSize
+} from '../extended-canvas';
 
 interface Props {
   imageArray: ndarray;
 }
 
 const CalculateCanvasSize = (
-  canvasRef: React.RefObject<HTMLCanvasElement>
+  elementRef: React.RefObject<HTMLElement>
 ): CanvasSize => {
   let hOffset = 0;
-  if (canvasRef.current) {
-    hOffset = canvasRef.current.offsetTop;
+  if (elementRef.current) {
+    hOffset = elementRef.current.offsetTop;
   }
   return {
     width: document.body.clientWidth / 2,
@@ -26,7 +30,8 @@ const CalculateCanvasSize = (
 };
 
 const Workspace = ({ imageArray }: Props) => {
-  const resultCanvasRef = React.useRef<HTMLCanvasElement>(null);
+  const divRef = React.useRef<HTMLDivElement>(null);
+  const resultCanvasRef = React.useRef<ExtendedCanvas>(null);
 
   const [baseImage, setBaseImage] = useState<CachedImage>();
   const [resultImage, setResultImage] = useState<CachedImage>();
@@ -35,6 +40,18 @@ const Workspace = ({ imageArray }: Props) => {
     MaskType.Foreground
   );
   const [grabCutWorker, setGrabCutWorker] = useState<GrabCutWorkerWrapper>();
+  const [transformState, setTransformState] = useState({
+    LastX: 0,
+    LastY: 0
+  });
+  const [canvasPosition, setCanvasPosition] = useState<CanvasPosition>({
+    x: 0,
+    y: 0
+  });
+  const [canvasScale, setCanvasScale] = useState<CanvasScale>({
+    x: 1,
+    y: 1
+  });
   const [canvasSize, setCanvasSize] = useState<CanvasSize>({
     width: 0,
     height: 0
@@ -42,7 +59,7 @@ const Workspace = ({ imageArray }: Props) => {
 
   useEffect(() => {
     const handleResize = () => {
-      setCanvasSize(CalculateCanvasSize(resultCanvasRef));
+      setCanvasSize(CalculateCanvasSize(divRef));
     };
 
     window.addEventListener('resize', handleResize);
@@ -51,8 +68,8 @@ const Workspace = ({ imageArray }: Props) => {
     };
   }, []);
   useEffect(() => {
-    setCanvasSize(CalculateCanvasSize(resultCanvasRef));
-  }, [resultCanvasRef]);
+    setCanvasSize(CalculateCanvasSize(divRef));
+  }, [divRef]);
 
   useEffect(() => {
     const newBaseImageData = BuildImageData(imageArray);
@@ -75,19 +92,8 @@ const Workspace = ({ imageArray }: Props) => {
   }, [imageArray]);
 
   useEffect(() => {
-    if (resultImage) {
-      Redraw(resultCanvasRef, resultImage);
-    }
+    if (resultCanvasRef.current) resultCanvasRef.current.Draw();
   }, [resultImage]);
-
-  useEffect(() => {
-    ResizeCanvas(canvasSize, resultCanvasRef);
-    if (resultImage) {
-      Redraw(resultCanvasRef, resultImage);
-    } else if (baseImage) {
-      Redraw(resultCanvasRef, baseImage);
-    }
-  }, [canvasSize]);
 
   return (
     <div>
@@ -114,9 +120,72 @@ const Workspace = ({ imageArray }: Props) => {
           Clear
         </button>
       </div>
-      <div className={styles.center}>
+      <div
+        className={styles.center}
+        ref={divRef}
+        onPointerDown={evt => {
+          if ((evt.buttons & 4) !== 4) return;
+          if (!divRef.current) return;
+
+          const rect = evt.currentTarget.getBoundingClientRect();
+          const x = evt.clientX - rect.left;
+          const y = evt.clientY - rect.top;
+          setTransformState({
+            LastX: x,
+            LastY: y
+          });
+        }}
+        onPointerMove={evt => {
+          if (!divRef.current) return;
+          if ((evt.buttons & 4) !== 4) return;
+
+          const rect = evt.currentTarget.getBoundingClientRect();
+          const x = evt.clientX - rect.left;
+          const y = evt.clientY - rect.top;
+
+          setCanvasPosition({
+            x: canvasPosition.x + (x - transformState.LastX),
+            y: canvasPosition.y + (y - transformState.LastY)
+          });
+
+          setTransformState({
+            LastX: x,
+            LastY: y
+          });
+        }}
+        onWheel={evt => {
+          const rect = evt.currentTarget.getBoundingClientRect();
+          const x = (evt.clientX - rect.left) % canvasSize.width;
+          const y = (evt.clientY - rect.top) % canvasSize.height;
+
+          const oldX = (x - canvasPosition.x) / canvasScale.x;
+          const oldY = (y - canvasPosition.y) / canvasScale.y;
+
+          const sign = evt.deltaY < 0 ? 1 : -1;
+          const scaleFactor = 1 + 0.1 * sign;
+
+          const newScaleX = canvasScale.x * scaleFactor;
+          const newScaleY = canvasScale.y * scaleFactor;
+
+          setCanvasScale({
+            x: newScaleX,
+            y: newScaleY
+          });
+
+          const newX = oldX * newScaleX + canvasPosition.x;
+          const newY = oldY * newScaleY + canvasPosition.y;
+
+          setCanvasPosition({
+            x: canvasPosition.x + (x - newX),
+            y: canvasPosition.y + (y - newY)
+          });
+        }}
+      >
         {baseImage && (
           <MaskEditorRenderer
+            position={canvasPosition}
+            scale={canvasScale}
+            size={canvasSize}
             baseImage={baseImage}
             edgeImage={edgeImage}
             targetMaskType={targetMaskType}
@@ -124,10 +193,19 @@ const Workspace = ({ imageArray }: Props) => {
               if (!grabCutWorker) return;
               grabCutWorker.UpdateMask(imageData);
             }}
-            canvasSize={canvasSize}
           ></MaskEditorRenderer>
         )}
-        <canvas ref={resultCanvasRef}></canvas>
+        <ExtendedCanvas
+          position={canvasPosition}
+          scale={canvasScale}
+          size={canvasSize}
+          draw={ctx => {
+            if (resultImage) {
+              resultImage.Draw(0, 0, ctx);
+            }
+          }}
+          ref={resultCanvasRef}
+        ></ExtendedCanvas>
       </div>
     </div>
   );
