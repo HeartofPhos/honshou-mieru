@@ -1,7 +1,7 @@
 {
   "name": "honshou-mieru",
   "version": "0.3.1",
-  "description": "PWA react boilerplate",
+  "description": "Grabcut Image Segmentation",
   "main": "src/index.tsx",
   "scripts": {
     "start": "webpack-dev-server --progress --config webpack/dev.config.js",
@@ -9,7 +9,8 @@
     "build": "webpack --mode production --config webpack/config.js",
     "postbuild": "react-snap",
     "clean": "rimraf build",
-    "lint": "eslint src --ext .tsx,.ts"
+    "lint": "eslint src --ext .tsx,.ts",
+    "deploy": "gh-pages -d build"
   },
   "repository": {
     "type": "git",
@@ -17,7 +18,7 @@
   },
   "keywords": [
     "React",
-    "PWA",
+    "Grabcut",
     "react-snap"
   ],
   "author": "Francois Laubscher",
@@ -42,6 +43,7 @@
     "dotenv-webpack": "^1.7.0",
     "file-loader": "^4.2.0",
     "get-pixels": "^3.3.2",
+    "gh-pages": "^2.1.1",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.8.0",
     "ndarray": "^1.0.18",
@@ -75,6 +77,6 @@
     "worker-loader": "^2.0.0"
   },
   "reactSnap": {
-    "publicPath": "/"
+    "publicPath": "/honshou-mieru/"
   }
 }
