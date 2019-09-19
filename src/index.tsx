@@ -17,8 +17,6 @@ const renderApp = (TheApp: React.FC) => {
       </BrowserRouter>
     );
 
-    // hydrate the client if dom is already rendered with react-snap
-    // only hydrates if you run the build script and host the static files somewhere
     return (
       (rootElement.hasChildNodes() && hydrate(HonshouMieruApp, rootElement)) ||
       render(HonshouMieruApp, rootElement)
