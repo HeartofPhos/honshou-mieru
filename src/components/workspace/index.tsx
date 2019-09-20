@@ -58,20 +58,6 @@ const Workspace = ({ imageArray }: Props) => {
   });
 
   useEffect(() => {
-    const handleResize = () => {
-      setCanvasSize(CalculateCanvasSize(divRef));
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-  useEffect(() => {
-    setCanvasSize(CalculateCanvasSize(divRef));
-  }, [divRef]);
-
-  useEffect(() => {
     const newBaseImageData = BuildImageData(imageArray);
     setBaseImage(new CachedImage(newBaseImageData));
     setResultImage(new CachedImage(newBaseImageData));
@@ -86,6 +72,16 @@ const Workspace = ({ imageArray }: Props) => {
 
     setGrabCutWorker(newWorker);
 
+    const maxScale = Math.min(
+      canvasSize.width / imageArray.shape[0],
+      canvasSize.height / imageArray.shape[1]
+    );
+    const newScale = {
+      x: maxScale,
+      y: maxScale
+    };
+    setCanvasScale(newScale);
+
     return () => {
       newWorker.Dispose();
     };
@@ -94,6 +90,33 @@ const Workspace = ({ imageArray }: Props) => {
   useEffect(() => {
     if (resultCanvasRef.current) resultCanvasRef.current.Draw();
   }, [resultImage]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setCanvasSize(CalculateCanvasSize(divRef));
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    const newSize = CalculateCanvasSize(divRef);
+
+    const maxScale = Math.min(
+      newSize.width / imageArray.shape[0],
+      newSize.height / imageArray.shape[1]
+    );
+    const newScale = {
+      x: maxScale,
+      y: maxScale
+    };
+    setCanvasScale(newScale);
+
+    setCanvasSize(newSize);
+  }, [divRef]);
 
   return (
     <div>
