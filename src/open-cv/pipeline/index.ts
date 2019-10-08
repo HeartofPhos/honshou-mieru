@@ -4,13 +4,21 @@ import { InitializeSource } from './initialize/initialize-source';
 import { PrepareGrabcutMask } from './process/prepare-grabcut-mask';
 import { GrabCut } from './process/grabcut';
 import { InterpretGrabcut } from './process/interpret-grabcut';
-import { BuildOutput } from './output/build-result';
+import { BuildEdges, BuildResult } from './output/build-output';
 import { CloseGaps } from './process/close-gaps';
+import { BorderMatting } from './process/border-matting';
+import { ColourStealing } from './process/colour-stealing';
+import { CalculateUnknownRegion } from './process/unknown-region';
 
 export interface GrabCutState {
   Mask: any;
   BackgroundModel: any;
   ForegroundModel: any;
+}
+
+export interface UnknownRegion {
+  Size: number;
+  Mask: any;
 }
 
 export interface SegmentState {
@@ -22,11 +30,13 @@ export interface SegmentState {
   Source: any;
   GrabCut: GrabCutState;
   OutputMask: any;
+
+  UnknownRegion: UnknownRegion;
 }
 
 export interface SegmentOutput {
   resultArray: Uint8ClampedArray;
-  edgeArray: Uint8ClampedArray;
+  edgeArray: Int32Array[];
 }
 
 export const InitializeState = (
@@ -45,8 +55,12 @@ export const InitializeState = (
     RunCount: 0,
     Original: originalMat,
     Source: InitializeSource(originalMat),
+    GrabCut: InitializeGrabCut(width, height),
     OutputMask: new cv.Mat(height, width, cv.CV_8UC1),
-    GrabCut: InitializeGrabCut(width, height)
+    UnknownRegion: {
+      Size: 3,
+      Mask: new cv.Mat(height, width, cv.CV_8UC1)
+    }
   };
   const t1 = performance.now();
   console.log(`InitializeState: ${t1 - t0}ms`);
@@ -63,13 +77,20 @@ export const Segement = (
   GrabCut(state);
   InterpretGrabcut(state);
   CloseGaps(state);
-  const output = BuildOutput(state);
+  CalculateUnknownRegion(state);
+  const edges = BuildEdges(state);
+  BorderMatting(state);
+  const result = BuildResult(state);
+  ColourStealing(state, result);
   const t1 = performance.now();
   console.log(`Segment: ${t1 - t0}ms`);
 
   state.RunCount++;
 
-  return output;
+  return {
+    resultArray: result,
+    edgeArray: edges
+  };
 };
 
 export const Dispose = (state: SegmentState) => {
@@ -80,4 +101,6 @@ export const Dispose = (state: SegmentState) => {
   state.GrabCut.Mask.delete();
   state.GrabCut.BackgroundModel.delete();
   state.GrabCut.ForegroundModel.delete();
+
+  state.UnknownRegion.Mask.delete();
 };

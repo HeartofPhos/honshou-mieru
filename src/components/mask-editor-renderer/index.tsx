@@ -4,14 +4,13 @@ import { MaskType } from '../../logic/misc';
 import styles from './styles.css';
 import MaskEditor from './mask-editor';
 import { CachedImage } from '../../logic/drawing';
-import ExtendedCanvas, {
-  CanvasSize,
-  CanvasScale,
-  CanvasPosition
-} from '../extended-canvas';
+import ExtendedCanvas, { CanvasSize, CanvasPosition } from '../extended-canvas';
 
-const SetBrushFromMaskType = (maskEditor: MaskEditor, maskType: MaskType) => {
-  const size = 10;
+const SetBrushFromMaskType = (
+  maskEditor: MaskEditor,
+  maskType: MaskType,
+  size: number
+) => {
   switch (maskType) {
     case MaskType.Background:
       {
@@ -41,10 +40,10 @@ interface DrawingState {
 
 interface Props {
   position: CanvasPosition;
-  scale: CanvasScale;
+  scale: number;
   size: CanvasSize;
   baseImage: CachedImage;
-  edgeImage?: CachedImage;
+  edgeArray?: Int32Array[];
   targetMaskType: MaskType;
   onMaskChanged?: OnMaskChanged;
 }
@@ -54,7 +53,7 @@ const MaskEditorRenderer = ({
   scale,
   size,
   baseImage,
-  edgeImage,
+  edgeArray,
   targetMaskType,
   onMaskChanged
 }: Props) => {
@@ -70,9 +69,9 @@ const MaskEditorRenderer = ({
     LastY: 0
   });
 
+  const maxBrushSize = 20;
   useEffect(() => {
     const newMaskEditor = new MaskEditor(baseImage.width, baseImage.height);
-    SetBrushFromMaskType(newMaskEditor, targetMaskType);
     setMaskEditor(newMaskEditor);
   }, [baseImage]);
 
@@ -80,13 +79,17 @@ const MaskEditorRenderer = ({
     if (edgeCanvasRef.current) {
       edgeCanvasRef.current.Draw();
     }
-  }, [edgeImage]);
+  }, [edgeArray]);
 
   useMemo(() => {
     if (maskEditor) {
-      SetBrushFromMaskType(maskEditor, targetMaskType);
+      SetBrushFromMaskType(
+        maskEditor,
+        targetMaskType,
+        Math.min(Math.ceil(maxBrushSize / scale), maxBrushSize)
+      );
     }
-  }, [targetMaskType]);
+  }, [maskEditor, targetMaskType, scale]);
 
   return (
     <div
@@ -115,8 +118,8 @@ const MaskEditorRenderer = ({
         if (!maskCanvasRef.current) return;
 
         const rect = divRef.current.getBoundingClientRect();
-        const x = (evt.clientX - rect.left - position.x) / scale.x;
-        const y = (evt.clientY - rect.top - position.y) / scale.y;
+        const x = (evt.clientX - rect.left - position.x) / scale;
+        const y = (evt.clientY - rect.top - position.y) / scale;
 
         maskEditor.DrawMask(x, y);
 
@@ -135,8 +138,8 @@ const MaskEditorRenderer = ({
         if (!divRef.current) return;
 
         const rect = divRef.current.getBoundingClientRect();
-        const x = (evt.clientX - rect.left - position.x) / scale.x;
-        const y = (evt.clientY - rect.top - position.y) / scale.y;
+        const x = (evt.clientX - rect.left - position.x) / scale;
+        const y = (evt.clientY - rect.top - position.y) / scale;
 
         maskEditor.DrawMaskLine(drawingState.LastX, drawingState.LastY, x, y);
 
@@ -156,6 +159,7 @@ const MaskEditorRenderer = ({
         position={position}
         scale={scale}
         size={size}
+        smoothingEnabled={false}
         draw={ctx => {
           baseImage.Draw(0, 0, ctx);
         }}
@@ -166,6 +170,7 @@ const MaskEditorRenderer = ({
         position={position}
         scale={scale}
         size={size}
+        smoothingEnabled={false}
         draw={ctx => {
           if (maskEditor) maskEditor.Draw(0, 0, ctx);
         }}
@@ -176,8 +181,25 @@ const MaskEditorRenderer = ({
         position={position}
         scale={scale}
         size={size}
+        smoothingEnabled={true}
         draw={ctx => {
-          if (edgeImage) edgeImage.Draw(0, 0, ctx);
+          if (edgeArray) {
+            ctx.lineWidth = 2.5 / scale;
+            ctx.strokeStyle = 'yellow';
+            for (let i = 0; i < edgeArray.length; i++) {
+              const edges = edgeArray[i];
+
+              ctx.beginPath();
+              ctx.moveTo(edges[0] + 0.5, edges[1] + 0.5);
+              for (let j = 2; j < edges.length + 2; j += 2) {
+                ctx.lineTo(
+                  edges[j % edges.length] + 0.5,
+                  edges[(j + 1) % edges.length] + 0.5
+                );
+              }
+              ctx.stroke();
+            }
+          }
         }}
         ref={edgeCanvasRef}
       ></ExtendedCanvas>

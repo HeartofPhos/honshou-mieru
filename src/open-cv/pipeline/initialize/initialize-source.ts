@@ -1,15 +1,5 @@
 import { cv } from '../../open-cv-wrapper';
-
-const ApplyToPlanes = (target: any, f: (planes: any) => void) => {
-  const tempPlanes = new cv.MatVector();
-  cv.split(target, tempPlanes);
-
-  f(tempPlanes);
-
-  cv.merge(tempPlanes, target);
-
-  tempPlanes.delete();
-};
+import { ApplyToPlanes } from '../utility';
 
 const ApplyToLightPlane = (target: any, f: (lightPlane: any) => void) => {
   cv.cvtColor(target, target, cv.COLOR_RGB2Lab, 0);
@@ -147,11 +137,9 @@ export const InitializeSource = (original: any) => {
   cv.cvtColor(original, output, cv.COLOR_RGBA2RGB, 0);
 
   ApplyToLightPlane(output, lightPlane => {
-    CLAHE(lightPlane, 4, 16);
+    CLAHE(lightPlane, 4, 4);
   });
-  Sharpen(output, 11, 150, 0.5, 255);
-  KMeans(output, 16, 0.0001, 10000, 1);
-  BilateralFilter(output, 5, 50, 10);
+  Sharpen(output, 19, 100, 0.5, 255);
 
   return output;
 };

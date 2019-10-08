@@ -29,14 +29,18 @@ ctx.addEventListener('message', (evt: any) => {
       {
         if (state != null) {
           const result = Segement(state, evt.data.maskBuffer);
+          const edgeBuffers = [];
+          for (let i = 0; i < result.edgeArray.length; i++) {
+            edgeBuffers.push(result.edgeArray[i].buffer);
+          }
 
           ctx.postMessage(
             {
               action: 'result-updated',
               resultBuffer: result.resultArray.buffer,
-              edgeBuffer: result.edgeArray.buffer
+              edgeBuffers: edgeBuffers
             },
-            [result.resultArray.buffer, result.edgeArray.buffer]
+            [result.resultArray.buffer, ...edgeBuffers]
           );
         }
       }

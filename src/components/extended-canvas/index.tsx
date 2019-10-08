@@ -1,12 +1,6 @@
-import React, { useEffect, RefObject, useState, useMemo } from 'react';
-import { Drawable } from '../../logic/drawing';
+import React from 'react';
 
 export interface CanvasPosition {
-  x: number;
-  y: number;
-}
-
-export interface CanvasScale {
   x: number;
   y: number;
 }
@@ -18,8 +12,9 @@ export interface CanvasSize {
 
 interface Props {
   position: CanvasPosition;
-  scale: CanvasScale;
+  scale: number;
   size: CanvasSize;
+  smoothingEnabled: boolean;
   draw: (ctx: CanvasRenderingContext2D) => void;
   className?: any;
 }
@@ -48,7 +43,7 @@ class ExtendedCanvas extends React.Component<Props> {
   public Draw() {
     const ctx = GetContext(this.canvasRef);
     if (!ctx) return;
-    ctx.imageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = this.props.smoothingEnabled;
 
     ctx.save();
     ctx.resetTransform();
@@ -64,10 +59,10 @@ class ExtendedCanvas extends React.Component<Props> {
 
     ResizeCanvas(this.props.size, ctx);
     ctx.setTransform(
-      this.props.scale.x,
+      this.props.scale,
       0,
       0,
-      this.props.scale.y,
+      this.props.scale,
       this.props.position.x,
       this.props.position.y
     );
@@ -92,10 +87,10 @@ class ExtendedCanvas extends React.Component<Props> {
 
     if (requireRescaling) {
       ctx.setTransform(
-        this.props.scale.x,
+        this.props.scale,
         0,
         0,
-        this.props.scale.y,
+        this.props.scale,
         this.props.position.x,
         this.props.position.y
       );

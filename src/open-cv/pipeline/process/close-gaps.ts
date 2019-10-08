@@ -88,17 +88,8 @@ const CloseUnmarkedSections = (state: SegmentState) => {
 
   bgdResult.delete();
   fgdResult.delete();
-  // clonedMaskMat.delete();
-};
-
-const MorphClose = (state: SegmentState) => {
-  const ksize = new cv.Size(3, 3);
-  const M = cv.getStructuringElement(cv.MORPH_ELLIPSE, ksize);
-  cv.morphologyEx(state.OutputMask, state.OutputMask, cv.MORPH_CLOSE, M);
-  M.delete();
 };
 
 export const CloseGaps = (state: SegmentState) => {
   CloseUnmarkedSections(state);
-  MorphClose(state);
 };

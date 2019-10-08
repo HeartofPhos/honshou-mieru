@@ -6,11 +6,7 @@ import styles from './styles.css';
 import MaskEditorRenderer from '../mask-editor-renderer';
 import GrabCutWorkerWrapper from './worker/worker-wrapper';
 import { CachedImage } from '../../logic/drawing';
-import ExtendedCanvas, {
-  CanvasPosition,
-  CanvasScale,
-  CanvasSize
-} from '../extended-canvas';
+import ExtendedCanvas, { CanvasPosition, CanvasSize } from '../extended-canvas';
 
 interface Props {
   imageArray: ndarray;
@@ -35,7 +31,7 @@ const Workspace = ({ imageArray }: Props) => {
 
   const [baseImage, setBaseImage] = useState<CachedImage>();
   const [resultImage, setResultImage] = useState<CachedImage>();
-  const [edgeImage, setEdgeImage] = useState<CachedImage>();
+  const [edgeArray, setEdgeArray] = useState<Int32Array[]>();
   const [targetMaskType, setTargetMaskType] = useState<MaskType>(
     MaskType.Foreground
   );
@@ -48,10 +44,7 @@ const Workspace = ({ imageArray }: Props) => {
     x: 0,
     y: 0
   });
-  const [canvasScale, setCanvasScale] = useState<CanvasScale>({
-    x: 1,
-    y: 1
-  });
+  const [canvasScale, setCanvasScale] = useState<number>(1);
   const [canvasSize, setCanvasSize] = useState<CanvasSize>({
     width: 0,
     height: 0
@@ -64,23 +57,19 @@ const Workspace = ({ imageArray }: Props) => {
 
     let newWorker = new GrabCutWorkerWrapper(
       newBaseImageData,
-      (resultImageData, edgeImageData) => {
+      (resultImageData, edgeArray) => {
         setResultImage(new CachedImage(resultImageData));
-        setEdgeImage(new CachedImage(edgeImageData));
+        setEdgeArray(edgeArray);
       }
     );
 
     setGrabCutWorker(newWorker);
 
-    const maxScale = Math.min(
+    const minScale = Math.min(
       canvasSize.width / imageArray.shape[0],
       canvasSize.height / imageArray.shape[1]
     );
-    const newScale = {
-      x: maxScale,
-      y: maxScale
-    };
-    setCanvasScale(newScale);
+    setCanvasScale(minScale);
 
     return () => {
       newWorker.Dispose();
@@ -105,15 +94,11 @@ const Workspace = ({ imageArray }: Props) => {
   useEffect(() => {
     const newSize = CalculateCanvasSize(divRef);
 
-    const maxScale = Math.min(
+    const minScale = Math.min(
       newSize.width / imageArray.shape[0],
       newSize.height / imageArray.shape[1]
     );
-    const newScale = {
-      x: maxScale,
-      y: maxScale
-    };
-    setCanvasScale(newScale);
+    setCanvasScale(minScale);
 
     setCanvasSize(newSize);
   }, [divRef]);
@@ -181,22 +166,17 @@ const Workspace = ({ imageArray }: Props) => {
           const x = (evt.clientX - rect.left) % canvasSize.width;
           const y = (evt.clientY - rect.top) % canvasSize.height;
 
-          const oldX = (x - canvasPosition.x) / canvasScale.x;
-          const oldY = (y - canvasPosition.y) / canvasScale.y;
+          const oldX = (x - canvasPosition.x) / canvasScale;
+          const oldY = (y - canvasPosition.y) / canvasScale;
 
           const sign = evt.deltaY < 0 ? 1 : -1;
           const scaleFactor = 1 + 0.1 * sign;
 
-          const newScaleX = canvasScale.x * scaleFactor;
-          const newScaleY = canvasScale.y * scaleFactor;
+          const newScale = canvasScale * scaleFactor;
+          setCanvasScale(newScale);
 
-          setCanvasScale({
-            x: newScaleX,
-            y: newScaleY
-          });
-
-          const newX = oldX * newScaleX + canvasPosition.x;
-          const newY = oldY * newScaleY + canvasPosition.y;
+          const newX = oldX * newScale + canvasPosition.x;
+          const newY = oldY * newScale + canvasPosition.y;
 
           setCanvasPosition({
             x: canvasPosition.x + (x - newX),
@@ -210,7 +190,7 @@ const Workspace = ({ imageArray }: Props) => {
             scale={canvasScale}
             size={canvasSize}
             baseImage={baseImage}
-            edgeImage={edgeImage}
+            edgeArray={edgeArray}
             targetMaskType={targetMaskType}
             onMaskChanged={imageData => {
               if (!grabCutWorker) return;
@@ -222,6 +202,7 @@ const Workspace = ({ imageArray }: Props) => {
           position={canvasPosition}
           scale={canvasScale}
           size={canvasSize}
+          smoothingEnabled={false}
           draw={ctx => {
             if (resultImage) {
               resultImage.Draw(0, 0, ctx);

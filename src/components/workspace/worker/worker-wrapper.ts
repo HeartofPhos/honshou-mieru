@@ -16,7 +16,7 @@ export default class GrabCutWorkerWrapper {
     imageData: ImageData,
     resultCallback: (
       resultImageData: ImageData,
-      edgeImageData: ImageData
+      edgeArray: Int32Array[]
     ) => void
   ) {
     this.width = imageData.width;
@@ -55,11 +55,7 @@ export default class GrabCutWorkerWrapper {
                 this.width,
                 this.height
               ),
-              new ImageData(
-                new Uint8ClampedArray(evt.data.edgeBuffer),
-                this.width,
-                this.height
-              )
+              evt.data.edgeBuffers.map((x: Buffer) => new Int32Array(x))
             );
 
             this.waitingForResponse = false;
@@ -79,6 +75,7 @@ export default class GrabCutWorkerWrapper {
 
     this.PostUpdateMask(newMessage);
   }
+
   private PostUpdateMask(message: MaskUpdatedMessage) {
     if (this.waitingForResponse) {
       this.bufferedMaskUpdatedMessage = message;

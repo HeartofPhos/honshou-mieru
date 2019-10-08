@@ -96,13 +96,13 @@ export class CircleClearBrush implements Brush {
   private outCanvas: HTMLCanvasElement;
 
   public constructor(size: number) {
-    this.size = size;
+    this.size = size % 2 == 0 ? size + 1 : size;
 
     this.outCanvas = document.createElement('canvas');
-    let outCtx = this.outCanvas.getContext('2d');
+    const outCtx = this.outCanvas.getContext('2d');
     if (outCtx) {
-      this.outCanvas.width = this.size + 1;
-      this.outCanvas.height = this.size + 1;
+      this.outCanvas.width = this.size;
+      this.outCanvas.height = this.size;
       outCtx.strokeStyle = '#000000';
       outCtx.fillStyle = '#000000';
       DrawCircle(
@@ -118,8 +118,8 @@ export class CircleClearBrush implements Brush {
     target.globalCompositeOperation = 'destination-out';
     target.drawImage(
       this.outCanvas,
-      Math.floor(x - this.size / 2),
-      Math.floor(y - this.size / 2)
+      Math.floor(0.5 + x - this.size / 2),
+      Math.floor(0.5 + y - this.size / 2)
     );
   }
 
@@ -144,14 +144,14 @@ export class CirclePixelBrush implements Brush {
   private brushCanvas: HTMLCanvasElement;
 
   public constructor(size: number, colour: string) {
-    this.size = size;
+    this.size = size % 2 == 0 ? size + 1 : size;
     this.clearBrush = new CircleClearBrush(size);
 
     this.brushCanvas = document.createElement('canvas');
-    let brushCtx = this.brushCanvas.getContext('2d');
+    const brushCtx = this.brushCanvas.getContext('2d');
     if (brushCtx) {
-      this.brushCanvas.width = this.size + 1;
-      this.brushCanvas.height = this.size + 1;
+      this.brushCanvas.width = this.size;
+      this.brushCanvas.height = this.size;
       brushCtx.strokeStyle = colour;
       brushCtx.fillStyle = colour;
       DrawCircle(
@@ -169,8 +169,8 @@ export class CirclePixelBrush implements Brush {
     target.globalCompositeOperation = 'source-over';
     target.drawImage(
       this.brushCanvas,
-      Math.floor(x - this.size / 2),
-      Math.floor(y - this.size / 2)
+      Math.floor(0.5 + x - this.size / 2),
+      Math.floor(0.5 + y - this.size / 2)
     );
   }
 
