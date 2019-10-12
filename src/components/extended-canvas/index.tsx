@@ -16,7 +16,7 @@ interface Props {
   size: CanvasSize;
   smoothingEnabled?: boolean;
   draw: (ctx: CanvasRenderingContext2D) => void;
-  className?: any;
+  className?: string;
 }
 
 const ResizeCanvas = (size: CanvasSize, ctx: CanvasRenderingContext2D) => {

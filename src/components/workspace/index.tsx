@@ -186,13 +186,24 @@ const Workspace = ({ imageArray }: Props) => {
           ></MaskEditorRenderer>
         )}
         {segmentWrapper && (
-          <DynamicCanvas
-            position={canvasPosition}
-            scale={canvasScale}
-            size={canvasSize}
-            smoothingEnabled={false}
-            drawable={segmentWrapper.ResultDrawable}
-          ></DynamicCanvas>
+          <div className={styles.rendererDiv}>
+            <DynamicCanvas
+              className={styles.baseCanvas}
+              position={canvasPosition}
+              scale={canvasScale}
+              size={canvasSize}
+              smoothingEnabled={false}
+              drawable={segmentWrapper.ResultDrawable}
+            ></DynamicCanvas>
+            <DynamicCanvas
+              className={styles.stackedCanvas}
+              position={canvasPosition}
+              scale={canvasScale}
+              size={canvasSize}
+              smoothingEnabled={false}
+              drawable={segmentWrapper.GhostRenderer}
+            ></DynamicCanvas>
+          </div>
         )}
       </div>
     </div>

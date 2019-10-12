@@ -30,7 +30,7 @@ const DynamicCanvas = ({
 
     if (drawable) {
       redraw();
-      drawable.onChange = redraw;
+      drawable.onChange.push(redraw);
     }
   }, [drawable]);
 

@@ -8,11 +8,10 @@ import DetachedCanvas from './detached-canvas';
 
 class PixelEditor implements Drawable {
   private detachedCanvas: DetachedCanvas;
-  private brush: Brush | null;
+  private brush?: Brush;
 
   public constructor(width: number, height: number) {
     this.detachedCanvas = new DetachedCanvas(width, height);
-    this.brush = null;
   }
 
   public SetBrush(size: number, color: string | null) {

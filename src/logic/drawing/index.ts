@@ -4,7 +4,7 @@ export interface Drawable {
   Draw(x: number, y: number, target: CanvasRenderingContext2D): void;
 }
 export interface DynamicDrawable extends Drawable {
-  onChange: (() => void) | undefined;
+  onChange: (() => void)[];
 }
 
 export class CachedImage implements Drawable {
@@ -43,13 +43,14 @@ export class DynamicImage implements DynamicDrawable {
   private _height: number;
   private canvas: HTMLCanvasElement;
 
-  public onChange: (() => void) | undefined;
+  public onChange: (() => void)[];
 
   public constructor() {
     this._width = 0;
     this._height = 0;
-
     this.canvas = document.createElement('canvas');
+
+    this.onChange = [];
   }
 
   public get width() {
@@ -74,6 +75,6 @@ export class DynamicImage implements DynamicDrawable {
     if (!ctx) throw 'Could not create CanvasRenderingContext2D';
     ctx.putImageData(imageData, 0, 0);
 
-    if (this.onChange) this.onChange();
+    this.onChange.forEach(x => x());
   }
 }

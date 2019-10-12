@@ -7,3 +7,18 @@
   display: flex;
   align-items: center;
 }
+
+.rendererDiv {
+  position: relative;
+}
+
+.baseCanvas {
+  image-rendering: pixelated;
+}
+
+.stackedCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  image-rendering: pixelated;
+}

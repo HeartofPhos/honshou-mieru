@@ -5,10 +5,12 @@ import PixelEditor from '../drawing/pixel-editor';
 class MaskEditor implements DynamicDrawable {
   private pixelEditor: PixelEditor;
 
-  public onChange: (() => void) | undefined;
+  public onChange: (() => void)[];
 
   public constructor(width: number, height: number) {
     this.pixelEditor = new PixelEditor(width, height);
+
+    this.onChange = [];
   }
 
   public SetBrush(size: number, maskType: MaskType) {
@@ -17,12 +19,12 @@ class MaskEditor implements DynamicDrawable {
 
   public DrawMask(x: number, y: number) {
     this.pixelEditor.DrawPixels(x, y);
-    if (this.onChange) this.onChange();
+    this.onChange.forEach(x => x());
   }
 
   public DrawMaskLine(x0: number, y0: number, x1: number, y1: number) {
     this.pixelEditor.DrawPixelsLine(x0, y0, x1, y1);
-    if (this.onChange) this.onChange();
+    this.onChange.forEach(x => x());
   }
 
   public Draw(x: number, y: number, target: CanvasRenderingContext2D) {

@@ -1,56 +1,55 @@
-import { DynamicDrawable } from '../drawing';
+import { DynamicDrawable, Brush, CirclePixelBrush } from '../drawing';
 import { MaskType } from '../misc';
-import PixelEditor from '../drawing/pixel-editor';
 
 class GhostRenderer implements DynamicDrawable {
-  private pixelEditor: PixelEditor;
   private x: number;
   private y: number;
+  private brush?: Brush;
+  private hideBrush: boolean;
 
-  public onChange: (() => void) | undefined;
+  public onChange: (() => void)[];
 
-  public constructor(width: number, height: number) {
-    this.pixelEditor = new PixelEditor(width, height);
+  public constructor() {
     this.x = 0;
     this.y = 0;
+    this.hideBrush = false;
+
+    this.onChange = [];
   }
 
   public SetBrush(size: number, maskType: MaskType) {
-    this.pixelEditor.SetBrush(size, this.ColorFromMaskType(maskType));
-    this.UpdateGhost();
+    this.brush = this.CreateBrush(size, maskType);
+    this.onChange.forEach(x => x());
   }
 
   public ClearGhost() {
     this.x = 0;
     this.y = 0;
-    this.pixelEditor.ClearPixels();
-    if (this.onChange) this.onChange();
+    this.hideBrush = true;
+    this.onChange.forEach(x => x());
   }
 
   public SetGhostPosition(x: number, y: number) {
     this.x = x;
     this.y = y;
-    this.UpdateGhost();
-  }
-
-  private UpdateGhost() {
-    this.pixelEditor.ClearPixels();
-    this.pixelEditor.DrawPixels(this.x, this.y);
-    if (this.onChange) this.onChange();
+    this.hideBrush = false;
+    this.onChange.forEach(x => x());
   }
 
   public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
-    this.pixelEditor.Draw(x, y, target);
+    if (this.brush && !this.hideBrush) {
+      this.brush.Draw(x + this.x, y + this.y, target);
+    }
   }
 
-  private ColorFromMaskType(maskType: MaskType): string | null {
+  private CreateBrush(size: number, maskType: MaskType) {
     switch (maskType) {
       case MaskType.Background:
-        return 'rgba(255,0,0,0.5)';
+        return new CirclePixelBrush(size, 'rgba(255,0,0,0.5)');
       case MaskType.Foreground:
-        return 'rgba(0,255,0,0.5)';
+        return new CirclePixelBrush(size, 'rgba(0,255,0,0.5)');
       default:
-        return 'rgba(0,0,255,0.5)';
+        return new CirclePixelBrush(size, 'rgba(0,0,255,0.5)');
     }
   }
 }

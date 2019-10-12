@@ -39,10 +39,7 @@ export default class SegmentWrapper {
     this.resultImage = new DynamicImage();
     this.maskEditor = new MaskEditor(srcImageData.width, srcImageData.height);
     this.edgeRenderer = new EdgeRenderer();
-    this.ghostRenderer = new GhostRenderer(
-      srcImageData.width,
-      srcImageData.height
-    );
+    this.ghostRenderer = new GhostRenderer();
 
     this.targetScale = 1;
 

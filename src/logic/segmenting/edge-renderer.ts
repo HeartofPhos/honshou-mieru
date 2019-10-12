@@ -1,15 +1,18 @@
-import DetachedCanvas from '../drawing/detached-canvas';
 import { DynamicDrawable } from '../drawing';
 
 export default class EdgeRenderer implements DynamicDrawable {
-  private edgeArray: Int32Array[] | undefined;
-  private lineWidth: number | undefined;
+  private edgeArray?: Int32Array[];
+  private lineWidth?: number;
 
-  public onChange: (() => void) | undefined;
+  public onChange: (() => void)[];
+
+  public constructor() {
+    this.onChange = [];
+  }
 
   public UpdateEdgeArray(edgeArray: Int32Array[]) {
     this.edgeArray = edgeArray;
-    if (this.onChange) this.onChange();
+    this.onChange.forEach(x => x());
   }
 
   public UpdateLineWidth(lineWidth: number) {
