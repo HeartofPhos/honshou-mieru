@@ -120,6 +120,25 @@ svg {
   align-items: center;
 }
 
+.styles__rendererDiv--uhJ85 {
+  position: relative;
+}
+
+.styles__baseCanvas--2hcMH {
+  -ms-interpolation-mode: nearest-neighbor;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: pixelated;
+}
+
+.styles__stackedCanvas--3Vqn0 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  -ms-interpolation-mode: nearest-neighbor;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: pixelated;
+}
+
 .styles__rendererDiv--3v8NO {
   position: relative;
 }
