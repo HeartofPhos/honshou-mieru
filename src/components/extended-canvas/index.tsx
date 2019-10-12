@@ -14,7 +14,7 @@ interface Props {
   position: CanvasPosition;
   scale: number;
   size: CanvasSize;
-  smoothingEnabled: boolean;
+  smoothingEnabled?: boolean;
   draw: (ctx: CanvasRenderingContext2D) => void;
   className?: any;
 }
@@ -43,7 +43,11 @@ class ExtendedCanvas extends React.Component<Props> {
   public Draw() {
     const ctx = GetContext(this.canvasRef);
     if (!ctx) return;
-    ctx.imageSmoothingEnabled = this.props.smoothingEnabled;
+
+    ctx.imageSmoothingEnabled =
+      this.props.smoothingEnabled !== undefined
+        ? this.props.smoothingEnabled
+        : true;
 
     ctx.save();
     ctx.resetTransform();

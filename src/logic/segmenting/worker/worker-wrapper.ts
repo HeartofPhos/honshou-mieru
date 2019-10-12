@@ -25,6 +25,7 @@ export default class GrabCutWorkerWrapper {
     this.grabCutWorker = new GrabCutWorker();
     this.waitingForResponse = true;
     this.bufferedMaskUpdatedMessage = null;
+    resultCallback(imageData, []);
 
     this.grabCutWorker.onmessage = evt => {
       switch (evt.data.action) {

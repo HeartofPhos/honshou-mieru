@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import ndarray = require('ndarray');
 
 import { BuildImageData, MaskType } from '../../logic/misc';
 import styles from './styles.css';
 import MaskEditorRenderer from '../mask-editor-renderer';
-import GrabCutWorkerWrapper from './worker/worker-wrapper';
-import { CachedImage } from '../../logic/drawing';
-import ExtendedCanvas, { CanvasPosition, CanvasSize } from '../extended-canvas';
+import { CanvasPosition, CanvasSize } from '../extended-canvas';
+import SegmentWrapper from '../../logic/segmenting/segment-wrapper';
+import DynamicCanvas from '../dynamic-canvas';
 
 interface Props {
   imageArray: ndarray;
@@ -27,15 +27,11 @@ const CalculateCanvasSize = (
 
 const Workspace = ({ imageArray }: Props) => {
   const divRef = React.useRef<HTMLDivElement>(null);
-  const resultCanvasRef = React.useRef<ExtendedCanvas>(null);
 
-  const [baseImage, setBaseImage] = useState<CachedImage>();
-  const [resultImage, setResultImage] = useState<CachedImage>();
-  const [edgeArray, setEdgeArray] = useState<Int32Array[]>();
+  const [segmentWrapper, setSegmentWrapper] = useState<SegmentWrapper>();
   const [targetMaskType, setTargetMaskType] = useState<MaskType>(
     MaskType.Foreground
   );
-  const [grabCutWorker, setGrabCutWorker] = useState<GrabCutWorkerWrapper>();
   const [transformState, setTransformState] = useState({
     LastX: 0,
     LastY: 0
@@ -52,18 +48,8 @@ const Workspace = ({ imageArray }: Props) => {
 
   useEffect(() => {
     const newBaseImageData = BuildImageData(imageArray);
-    setBaseImage(new CachedImage(newBaseImageData));
-    setResultImage(new CachedImage(newBaseImageData));
-
-    let newWorker = new GrabCutWorkerWrapper(
-      newBaseImageData,
-      (resultImageData, edgeArray) => {
-        setResultImage(new CachedImage(resultImageData));
-        setEdgeArray(edgeArray);
-      }
-    );
-
-    setGrabCutWorker(newWorker);
+    const newSegmentWrapper = new SegmentWrapper(newBaseImageData);
+    setSegmentWrapper(newSegmentWrapper);
 
     const minScale = Math.min(
       canvasSize.width / imageArray.shape[0],
@@ -72,13 +58,9 @@ const Workspace = ({ imageArray }: Props) => {
     setCanvasScale(minScale);
 
     return () => {
-      newWorker.Dispose();
+      newSegmentWrapper.Dispose();
     };
   }, [imageArray]);
-
-  useEffect(() => {
-    if (resultCanvasRef.current) resultCanvasRef.current.Draw();
-  }, [resultImage]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -102,6 +84,10 @@ const Workspace = ({ imageArray }: Props) => {
 
     setCanvasSize(newSize);
   }, [divRef]);
+
+  useMemo(() => {
+    if (segmentWrapper) segmentWrapper.UpdateTargetScale(canvasScale);
+  }, [canvasScale]);
 
   return (
     <div>
@@ -184,32 +170,30 @@ const Workspace = ({ imageArray }: Props) => {
           });
         }}
       >
-        {baseImage && (
+        {segmentWrapper && (
           <MaskEditorRenderer
             position={canvasPosition}
             scale={canvasScale}
             size={canvasSize}
-            baseImage={baseImage}
-            edgeArray={edgeArray}
+            baseImage={segmentWrapper.SourceImage}
+            maskEditor={segmentWrapper.MaskEditor}
+            ghostRenderer={segmentWrapper.GhostRenderer}
+            edgeRenderer={segmentWrapper.EdgeDrawable}
             targetMaskType={targetMaskType}
-            onMaskChanged={imageData => {
-              if (!grabCutWorker) return;
-              grabCutWorker.UpdateMask(imageData);
+            onMaskChanged={() => {
+              if (segmentWrapper) segmentWrapper.Segment();
             }}
           ></MaskEditorRenderer>
         )}
-        <ExtendedCanvas
-          position={canvasPosition}
-          scale={canvasScale}
-          size={canvasSize}
-          smoothingEnabled={false}
-          draw={ctx => {
-            if (resultImage) {
-              resultImage.Draw(0, 0, ctx);
-            }
-          }}
-          ref={resultCanvasRef}
-        ></ExtendedCanvas>
+        {segmentWrapper && (
+          <DynamicCanvas
+            position={canvasPosition}
+            scale={canvasScale}
+            size={canvasSize}
+            smoothingEnabled={false}
+            drawable={segmentWrapper.ResultDrawable}
+          ></DynamicCanvas>
+        )}
       </div>
     </div>
   );

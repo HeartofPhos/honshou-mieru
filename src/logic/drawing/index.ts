@@ -3,13 +3,15 @@ export * from './brushes';
 export interface Drawable {
   Draw(x: number, y: number, target: CanvasRenderingContext2D): void;
 }
+export interface DynamicDrawable extends Drawable {
+  onChange: (() => void) | undefined;
+}
 
 export class CachedImage implements Drawable {
   private _width: number;
   private _height: number;
 
   private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
 
   public constructor(imageData: ImageData) {
     this._width = imageData.width;
@@ -21,8 +23,6 @@ export class CachedImage implements Drawable {
 
     let ctx = this.canvas.getContext('2d');
     if (!ctx) throw 'Could not create CanvasRenderingContext2D';
-    this.ctx = ctx;
-
     ctx.putImageData(imageData, 0, 0);
   }
 
@@ -35,5 +35,45 @@ export class CachedImage implements Drawable {
 
   public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
     target.drawImage(this.canvas, x, y);
+  }
+}
+
+export class DynamicImage implements DynamicDrawable {
+  private _width: number;
+  private _height: number;
+  private canvas: HTMLCanvasElement;
+
+  public onChange: (() => void) | undefined;
+
+  public constructor() {
+    this._width = 0;
+    this._height = 0;
+
+    this.canvas = document.createElement('canvas');
+  }
+
+  public get width() {
+    return this._width;
+  }
+  public get height() {
+    return this._height;
+  }
+
+  public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
+    target.drawImage(this.canvas, x, y);
+  }
+
+  public UpdateImage(imageData: ImageData) {
+    this._width = imageData.width;
+    this._height = imageData.height;
+
+    this.canvas.width = this._width;
+    this.canvas.height = this._height;
+
+    let ctx = this.canvas.getContext('2d');
+    if (!ctx) throw 'Could not create CanvasRenderingContext2D';
+    ctx.putImageData(imageData, 0, 0);
+
+    if (this.onChange) this.onChange();
   }
 }

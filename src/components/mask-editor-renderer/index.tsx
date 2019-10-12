@@ -1,36 +1,15 @@
 //@ts-ignore
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { MaskType } from '../../logic/misc';
 import styles from './styles.css';
-import MaskEditor from './mask-editor';
-import { CachedImage } from '../../logic/drawing';
-import ExtendedCanvas, { CanvasSize, CanvasPosition } from '../extended-canvas';
+import MaskEditor from '../../logic/segmenting/mask-editor';
+import { Drawable, DynamicDrawable } from '../../logic/drawing';
+import { CanvasSize, CanvasPosition } from '../extended-canvas';
+import DrawableRenderer from '../drawable-renderer';
+import GhostRenderer from '../../logic/segmenting/ghost-renderer';
+import DynamicCanvas from '../dynamic-canvas';
 
-const SetBrushFromMaskType = (
-  maskEditor: MaskEditor,
-  maskType: MaskType,
-  size: number
-) => {
-  switch (maskType) {
-    case MaskType.Background:
-      {
-        maskEditor.SetBrush(size, 'rgba(255,0,0,0.5)');
-      }
-      break;
-    case MaskType.Foreground:
-      {
-        maskEditor.SetBrush(size, 'rgba(0,255,0,0.5)');
-      }
-      break;
-    default:
-      {
-        maskEditor.SetBrush(size, null);
-      }
-      break;
-  }
-};
-
-type OnMaskChanged = (imageData: ImageData) => void;
+type OnMaskChanged = () => void;
 
 interface DrawingState {
   IsDrawing: boolean;
@@ -42,8 +21,10 @@ interface Props {
   position: CanvasPosition;
   scale: number;
   size: CanvasSize;
-  baseImage: CachedImage;
-  edgeArray?: Int32Array[];
+  baseImage: Drawable;
+  maskEditor: MaskEditor;
+  ghostRenderer: GhostRenderer;
+  edgeRenderer: DynamicDrawable;
   targetMaskType: MaskType;
   onMaskChanged?: OnMaskChanged;
 }
@@ -53,16 +34,14 @@ const MaskEditorRenderer = ({
   scale,
   size,
   baseImage,
-  edgeArray,
+  maskEditor,
+  ghostRenderer,
+  edgeRenderer,
   targetMaskType,
   onMaskChanged
 }: Props) => {
   const divRef = React.useRef<HTMLDivElement>(null);
-  const baseCanvasRef = React.useRef<ExtendedCanvas>(null);
-  const maskCanvasRef = React.useRef<ExtendedCanvas>(null);
-  const edgeCanvasRef = React.useRef<ExtendedCanvas>(null);
 
-  const [maskEditor, setMaskEditor] = useState<MaskEditor>();
   const [drawingState, setDrawingState] = useState<DrawingState>({
     IsDrawing: false,
     LastX: 0,
@@ -70,26 +49,22 @@ const MaskEditorRenderer = ({
   });
 
   const maxBrushSize = 20;
-  useEffect(() => {
-    const newMaskEditor = new MaskEditor(baseImage.width, baseImage.height);
-    setMaskEditor(newMaskEditor);
-  }, [baseImage]);
-
-  useEffect(() => {
-    if (edgeCanvasRef.current) {
-      edgeCanvasRef.current.Draw();
-    }
-  }, [edgeArray]);
-
   useMemo(() => {
     if (maskEditor) {
-      SetBrushFromMaskType(
-        maskEditor,
-        targetMaskType,
-        Math.min(Math.ceil(maxBrushSize / scale), maxBrushSize)
+      maskEditor.SetBrush(
+        Math.min(Math.ceil(maxBrushSize / scale), maxBrushSize),
+        targetMaskType
       );
     }
   }, [maskEditor, targetMaskType, scale]);
+  useMemo(() => {
+    if (ghostRenderer) {
+      ghostRenderer.SetBrush(
+        Math.min(Math.ceil(maxBrushSize / scale), maxBrushSize),
+        targetMaskType
+      );
+    }
+  }, [ghostRenderer, targetMaskType, scale]);
 
   return (
     <div
@@ -98,7 +73,7 @@ const MaskEditorRenderer = ({
       onPointerUp={() => {
         if (drawingState.IsDrawing) {
           if (maskEditor && onMaskChanged) {
-            onMaskChanged(maskEditor.GetData());
+            onMaskChanged();
           }
           setDrawingState({ ...drawingState, IsDrawing: false });
         }
@@ -106,16 +81,18 @@ const MaskEditorRenderer = ({
       onPointerOut={() => {
         if (drawingState.IsDrawing) {
           if (maskEditor && onMaskChanged) {
-            onMaskChanged(maskEditor.GetData());
+            onMaskChanged();
           }
           setDrawingState({ ...drawingState, IsDrawing: false });
+        }
+        if (ghostRenderer) {
+          ghostRenderer.ClearGhost();
         }
       }}
       onPointerDown={evt => {
         if ((evt.buttons & 1) !== 1) return;
         if (!maskEditor) return;
         if (!divRef.current) return;
-        if (!maskCanvasRef.current) return;
 
         const rect = divRef.current.getBoundingClientRect();
         const x = (evt.clientX - rect.left - position.x) / scale;
@@ -128,18 +105,21 @@ const MaskEditorRenderer = ({
           LastX: x,
           LastY: y
         });
-
-        maskCanvasRef.current.Draw();
       }}
       onPointerMove={evt => {
-        if ((evt.buttons & 1) !== 1) return;
-        if (!drawingState.IsDrawing) return;
-        if (!maskEditor) return;
         if (!divRef.current) return;
 
         const rect = divRef.current.getBoundingClientRect();
         const x = (evt.clientX - rect.left - position.x) / scale;
         const y = (evt.clientY - rect.top - position.y) / scale;
+
+        if (ghostRenderer) {
+          ghostRenderer.SetGhostPosition(x, y);
+        }
+
+        if ((evt.buttons & 1) !== 1) return;
+        if (!drawingState.IsDrawing) return;
+        if (!maskEditor) return;
 
         maskEditor.DrawMaskLine(drawingState.LastX, drawingState.LastY, x, y);
 
@@ -148,61 +128,40 @@ const MaskEditorRenderer = ({
           LastX: x,
           LastY: y
         });
-
-        if (maskCanvasRef.current) {
-          maskCanvasRef.current.Draw();
-        }
       }}
     >
-      <ExtendedCanvas
+      <DrawableRenderer
         className={styles.baseCanvas}
         position={position}
         scale={scale}
         size={size}
         smoothingEnabled={false}
-        draw={ctx => {
-          baseImage.Draw(0, 0, ctx);
-        }}
-        ref={baseCanvasRef}
-      ></ExtendedCanvas>
-      <ExtendedCanvas
+        drawable={baseImage}
+      ></DrawableRenderer>
+      <DynamicCanvas
         className={styles.stackedCanvas}
         position={position}
         scale={scale}
         size={size}
         smoothingEnabled={false}
-        draw={ctx => {
-          if (maskEditor) maskEditor.Draw(0, 0, ctx);
-        }}
-        ref={maskCanvasRef}
-      ></ExtendedCanvas>
-      <ExtendedCanvas
+        drawable={maskEditor}
+      ></DynamicCanvas>
+      <DynamicCanvas
+        className={styles.stackedCanvas}
+        position={position}
+        scale={scale}
+        size={size}
+        smoothingEnabled={false}
+        drawable={ghostRenderer}
+      ></DynamicCanvas>
+      <DynamicCanvas
         className={styles.stackedCanvas}
         position={position}
         scale={scale}
         size={size}
         smoothingEnabled={true}
-        draw={ctx => {
-          if (edgeArray) {
-            ctx.lineWidth = 2.5 / scale;
-            ctx.strokeStyle = 'yellow';
-            for (let i = 0; i < edgeArray.length; i++) {
-              const edges = edgeArray[i];
-
-              ctx.beginPath();
-              ctx.moveTo(edges[0] + 0.5, edges[1] + 0.5);
-              for (let j = 2; j < edges.length + 2; j += 2) {
-                ctx.lineTo(
-                  edges[j % edges.length] + 0.5,
-                  edges[(j + 1) % edges.length] + 0.5
-                );
-              }
-              ctx.stroke();
-            }
-          }
-        }}
-        ref={edgeCanvasRef}
-      ></ExtendedCanvas>
+        drawable={edgeRenderer}
+      ></DynamicCanvas>
     </div>
   );
 };
