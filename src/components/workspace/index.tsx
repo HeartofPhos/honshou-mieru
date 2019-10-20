@@ -19,9 +19,12 @@ const CalculateCanvasSize = (
   if (elementRef.current) {
     hOffset = elementRef.current.offsetTop;
   }
+
+  const w = Math.max(window.innerWidth, document.body.clientWidth);
+  const h = Math.max(window.innerHeight, document.body.clientHeight);
   return {
-    width: document.body.clientWidth / 2,
-    height: document.body.clientHeight - hOffset
+    width: w / 2,
+    height: h - hOffset
   };
 };
 
