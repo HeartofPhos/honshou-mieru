@@ -7,6 +7,7 @@ import MaskEditorRenderer from '../mask-editor-renderer';
 import { CanvasPosition, CanvasSize } from '../extended-canvas';
 import SegmentWrapper from '../../logic/segmenting/segment-wrapper';
 import DynamicCanvas from '../dynamic-canvas';
+import BrushSettings from '../brush-settings';
 
 interface Props {
   imageArray: ndarray;
@@ -32,9 +33,8 @@ const Workspace = ({ imageArray }: Props) => {
   const divRef = React.useRef<HTMLDivElement>(null);
 
   const [segmentWrapper, setSegmentWrapper] = useState<SegmentWrapper>();
-  const [targetMaskType, setTargetMaskType] = useState<MaskType>(
-    MaskType.Foreground
-  );
+  const [targetMaskType, setTargetMaskType] = useState(MaskType.Foreground);
+  const [brushSize, setBrushSize] = useState(20);
   const [transformState, setTransformState] = useState({
     LastX: 0,
     LastY: 0
@@ -94,31 +94,17 @@ const Workspace = ({ imageArray }: Props) => {
 
   return (
     <div>
-      <div className={styles.buttonGroup}>
-        <button
-          onClick={() => {
-            setTargetMaskType(MaskType.Foreground);
-          }}
-        >
-          Foreground
-        </button>
-        <button
-          onClick={() => {
-            setTargetMaskType(MaskType.Background);
-          }}
-        >
-          Background
-        </button>
-        <button
-          onClick={() => {
-            setTargetMaskType(MaskType.ProbablyBackground);
-          }}
-        >
-          Clear
-        </button>
+      <div className={styles.brushHolder}>
+        <BrushSettings
+          className={styles.brushSettings}
+          maskType={targetMaskType}
+          brushSize={brushSize}
+          onMaskTypeChange={newMaskType => setTargetMaskType(newMaskType)}
+          onBrushSizeChange={newBrushSize => setBrushSize(newBrushSize)}
+        ></BrushSettings>
       </div>
       <div
-        className={styles.center}
+        className={styles.canvasHolder}
         ref={divRef}
         onPointerDown={evt => {
           if ((evt.buttons & 4) !== 4) return;
@@ -183,13 +169,14 @@ const Workspace = ({ imageArray }: Props) => {
             ghostRenderer={segmentWrapper.GhostRenderer}
             edgeRenderer={segmentWrapper.EdgeDrawable}
             targetMaskType={targetMaskType}
+            brushSize={brushSize}
             onMaskChanged={() => {
               if (segmentWrapper) segmentWrapper.Segment();
             }}
           ></MaskEditorRenderer>
         )}
         {segmentWrapper && (
-          <div className={styles.rendererDiv}>
+          <div style={{ position: 'relative' }}>
             <DynamicCanvas
               className={styles.baseCanvas}
               position={canvasPosition}

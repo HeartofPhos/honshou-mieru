@@ -1,9 +1,10 @@
 .dragDrop {
   width: 400px;
-  margin: 1rem;
+  margin-top: 0.5rem;
   padding: 2rem 1rem;
   border: 0.15rem;
   border-color: var(--primary-light);
   border-style: solid;
+  border-radius: 5px;
   text-align: center;
 }

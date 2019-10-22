@@ -1,15 +1,28 @@
-.center {
+.brushHolder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
   display: flex;
+  flex-flow: column;
   align-items: center;
+  pointer-events: none;
 }
 
-.buttonGroup {
-  display: flex;
-  align-items: center;
+.brushSettings {
+  margin-top: 0.5rem;
+  background: var(--mineshaft);
+  padding: 0.25rem;
+  border: 0.15rem;
+  border-color: var(--primary-light);
+  border-style: solid;
+  border-radius: 5px;
+  pointer-events: auto;
 }
 
-.rendererDiv {
-  position: relative;
+.canvasHolder {
+  display: flex;
 }
 
 .baseCanvas {

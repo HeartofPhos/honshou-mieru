@@ -11,12 +11,12 @@ export interface CanvasSize {
 }
 
 interface Props {
+  className?: string;
   position: CanvasPosition;
   scale: number;
   size: CanvasSize;
   smoothingEnabled?: boolean;
   draw: (ctx: CanvasRenderingContext2D) => void;
-  className?: string;
 }
 
 const ResizeCanvas = (size: CanvasSize, ctx: CanvasRenderingContext2D) => {

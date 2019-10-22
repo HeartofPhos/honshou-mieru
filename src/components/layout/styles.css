@@ -1,10 +1,9 @@
 :root {
-  --primary: #f28a30;
-  --primary-dark: #dc7e2c;
+  --primary: #7e2cdc;
+  --primary-dark: #7e2cdcc9;
   --primary-light: #fdf4ec;
   --alabaster: #fafafa;
   --mineshaft: #383838;
-  --tundora: #404040;
 }
 
 * {
@@ -15,8 +14,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Lato', sans-serif;
-  background-color: white;
-  color: var(--mineshaft);
+  background-color: var(--mineshaft);
+  color: var(--alabaster);
 }
 
 svg {

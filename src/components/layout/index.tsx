@@ -1,8 +1,5 @@
 import React from 'react';
 
-// components
-import Nav from '../nav';
-
 import styles from './styles.css';
 
 interface Props {
@@ -11,7 +8,6 @@ interface Props {
 
 const Layout = ({ children }: Props) => (
   <>
-    <Nav />
     <main className={styles.container}>{children}</main>
   </>
 );

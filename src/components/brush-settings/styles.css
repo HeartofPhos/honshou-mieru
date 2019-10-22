@@ -1,0 +1,9 @@
+.flexGroup {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+.brushSizeRange {
+  width: 100%;
+}

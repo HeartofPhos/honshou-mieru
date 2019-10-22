@@ -3,7 +3,6 @@ import { Route, Switch } from 'react-router-dom';
 
 import Layout from '../components/layout';
 
-// containers
 import Home from './home';
 import NotFound from './not-found';
 

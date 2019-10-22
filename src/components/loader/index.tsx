@@ -1,7 +1,7 @@
 import React from 'react';
 import classnames from 'classnames';
 
-import { ReactComponent as Logo } from '../nav/logo.svg';
+import { ReactComponent as Logo } from './logo.svg';
 
 import styles from './styles.css';
 

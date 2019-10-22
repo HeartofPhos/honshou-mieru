@@ -26,6 +26,7 @@ interface Props {
   ghostRenderer: GhostRenderer;
   edgeRenderer: DynamicDrawable;
   targetMaskType: MaskType;
+  brushSize: number;
   onMaskChanged?: OnMaskChanged;
 }
 
@@ -38,6 +39,7 @@ const MaskEditorRenderer = ({
   ghostRenderer,
   edgeRenderer,
   targetMaskType,
+  brushSize,
   onMaskChanged
 }: Props) => {
   const divRef = React.useRef<HTMLDivElement>(null);
@@ -48,23 +50,23 @@ const MaskEditorRenderer = ({
     LastY: 0
   });
 
-  const maxBrushSize = 20;
   useMemo(() => {
     if (maskEditor) {
       maskEditor.SetBrush(
-        Math.min(Math.ceil(maxBrushSize / scale), maxBrushSize),
+        Math.min(Math.ceil(brushSize / scale), brushSize),
         targetMaskType
       );
     }
-  }, [maskEditor, targetMaskType, scale]);
+  }, [maskEditor, targetMaskType, brushSize, scale]);
+
   useMemo(() => {
     if (ghostRenderer) {
       ghostRenderer.SetBrush(
-        Math.min(Math.ceil(maxBrushSize / scale), maxBrushSize),
+        Math.min(Math.ceil(brushSize / scale), brushSize),
         targetMaskType
       );
     }
-  }, [ghostRenderer, targetMaskType, scale]);
+  }, [ghostRenderer, targetMaskType, brushSize, scale]);
 
   return (
     <div
