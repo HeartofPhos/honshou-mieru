@@ -1,4 +1,4 @@
-.brushHolder {
+.controlsHolder {
   position: absolute;
   top: 0;
   left: 0;
@@ -10,8 +10,25 @@
   pointer-events: none;
 }
 
+.controlsBox {
+  display: flex;
+}
+
+.save {
+  margin-top: 0.5rem;
+  background: var(--mineshaft);
+  padding: 0.25rem;
+  border: 0.15rem;
+  border-color: var(--primary-light);
+  border-style: solid;
+  border-radius: 5px;
+  pointer-events: auto;
+  color: var(--primary-light);
+}
+
 .brushSettings {
   margin-top: 0.5rem;
+  margin-right: 0.5rem;
   background: var(--mineshaft);
   padding: 0.25rem;
   border: 0.15rem;

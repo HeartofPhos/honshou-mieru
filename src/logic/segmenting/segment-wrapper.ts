@@ -21,7 +21,7 @@ export default class SegmentWrapper {
   public get SourceImage(): Drawable {
     return this.sourceImage;
   }
-  public get ResultDrawable(): DynamicDrawable {
+  public get ResultDrawable(): DynamicImage {
     return this.resultImage;
   }
   public get EdgeDrawable(): DynamicDrawable {

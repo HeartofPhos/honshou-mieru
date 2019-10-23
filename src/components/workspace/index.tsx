@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import ndarray = require('ndarray');
 
-import { BuildImageData, MaskType } from '../../logic/misc';
+import { BuildImageData, MaskType, SaveImage, SaveGif } from '../../logic/misc';
 import styles from './styles.css';
 import MaskEditorRenderer from '../mask-editor-renderer';
 import { CanvasPosition, CanvasSize } from '../extended-canvas';
@@ -94,14 +94,26 @@ const Workspace = ({ imageArray }: Props) => {
 
   return (
     <div>
-      <div className={styles.brushHolder}>
-        <BrushSettings
-          className={styles.brushSettings}
-          maskType={targetMaskType}
-          brushSize={brushSize}
-          onMaskTypeChange={newMaskType => setTargetMaskType(newMaskType)}
-          onBrushSizeChange={newBrushSize => setBrushSize(newBrushSize)}
-        ></BrushSettings>
+      <div className={styles.controlsHolder}>
+        <div className={styles.controlsBox}>
+          <BrushSettings
+            className={styles.brushSettings}
+            maskType={targetMaskType}
+            brushSize={brushSize}
+            onMaskTypeChange={newMaskType => setTargetMaskType(newMaskType)}
+            onBrushSizeChange={newBrushSize => setBrushSize(newBrushSize)}
+          ></BrushSettings>
+          <button
+            className={styles.save}
+            onClick={() => {
+              if (!segmentWrapper) return;
+              SaveImage(segmentWrapper.ResultDrawable);
+              // SaveGif([segmentWrapper.ResultDrawable]);
+            }}
+          >
+            Save
+          </button>
+        </div>
       </div>
       <div
         className={styles.canvasHolder}

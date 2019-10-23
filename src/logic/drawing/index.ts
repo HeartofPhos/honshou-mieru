@@ -42,6 +42,7 @@ export class DynamicImage implements DynamicDrawable {
   private _width: number;
   private _height: number;
   private canvas: HTMLCanvasElement;
+  private ctx: CanvasRenderingContext2D;
 
   public onChange: (() => void)[];
 
@@ -49,6 +50,9 @@ export class DynamicImage implements DynamicDrawable {
     this._width = 0;
     this._height = 0;
     this.canvas = document.createElement('canvas');
+    const ctx = this.canvas.getContext('2d');
+    if (!ctx) throw 'Could not create CanvasRenderingContext2D';
+    this.ctx = ctx;
 
     this.onChange = [];
   }
@@ -71,10 +75,21 @@ export class DynamicImage implements DynamicDrawable {
     this.canvas.width = this._width;
     this.canvas.height = this._height;
 
-    let ctx = this.canvas.getContext('2d');
-    if (!ctx) throw 'Could not create CanvasRenderingContext2D';
-    ctx.putImageData(imageData, 0, 0);
+    this.ctx.putImageData(imageData, 0, 0);
 
     this.onChange.forEach(x => x());
+  }
+
+  public GetData() {
+    return this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  public ToBlob() {
+    return new Promise((resolve: (value: Blob) => void, reject) => {
+      this.canvas.toBlob(blob => {
+        if (blob) resolve(blob);
+        else reject('Could not create blob');
+      });
+    });
   }
 }
