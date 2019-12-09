@@ -43,7 +43,8 @@ svg {
 
 .styles__logo--3KfLi {
   height: 300px;
-  transform: rotate(0);
+  -webkit-transform: rotate(0);
+          transform: rotate(0);
 }
 
 .styles__animating--3DQYL {
@@ -53,19 +54,23 @@ svg {
 
 @-webkit-keyframes styles__spin--3oAMB {
   from {
-    transform: rotate(0);
+    -webkit-transform: rotate(0);
+            transform: rotate(0);
   }
   to {
-    transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
   }
 }
 
 @keyframes styles__spin--3oAMB {
   from {
-    transform: rotate(0);
+    -webkit-transform: rotate(0);
+            transform: rotate(0);
   }
   to {
-    transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
   }
 }
 
@@ -86,13 +91,18 @@ svg {
   left: 0;
   right: 0;
   z-index: 1;
+  display: -webkit-box;
   display: flex;
-  flex-flow: column;
-  align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+          flex-flow: column;
+  -webkit-box-align: center;
+          align-items: center;
   pointer-events: none;
 }
 
 .styles__controlsBox--2XFaM {
+  display: -webkit-box;
   display: flex;
 }
 
@@ -121,6 +131,7 @@ svg {
 }
 
 .styles__canvasHolder--HCFij {
+  display: -webkit-box;
   display: flex;
 }
 
@@ -159,8 +170,10 @@ svg {
 }
 
 .styles__flexGroup--2Y4ti {
+  display: -webkit-box;
   display: flex;
-  align-items: center;
+  -webkit-box-align: center;
+          align-items: center;
   margin: 0;
 }
 
@@ -169,14 +182,22 @@ svg {
 }
 
 .styles__center--2svW1 {
+    display: -webkit-box;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+            flex-direction: column;
+    -webkit-box-align: center;
+            align-items: center;
 }
 .styles__notFound--3u_GX {
+  display: -webkit-box;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+          flex-direction: column;
+  -webkit-box-align: center;
+          align-items: center;
 }
 
 .styles__notFound--3u_GX h1 {
