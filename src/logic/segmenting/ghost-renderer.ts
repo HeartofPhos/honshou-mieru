@@ -45,11 +45,11 @@ class GhostRenderer implements DynamicDrawable {
   private CreateBrush(size: number, maskType: MaskType) {
     switch (maskType) {
       case MaskType.Background:
-        return new CirclePixelBrush(size, 'rgba(255,0,0,0.5)');
+        return CirclePixelBrush(size, 'rgba(255,0,0,0.5)');
       case MaskType.Foreground:
-        return new CirclePixelBrush(size, 'rgba(0,255,0,0.5)');
+        return CirclePixelBrush(size, 'rgba(0,255,0,0.5)');
       default:
-        return new CirclePixelBrush(size, 'rgba(0,0,255,0.5)');
+        return CirclePixelBrush(size, 'rgba(0,0,255,0.5)');
     }
   }
 }

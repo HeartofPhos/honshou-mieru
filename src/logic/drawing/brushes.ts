@@ -1,6 +1,7 @@
 import { Drawable } from '.';
+import DetachedCanvas from './detached-canvas';
 
-const StepDrawBresenhamLine = (
+const StepBresenhamLine = (
   x0: number,
   y0: number,
   x1: number,
@@ -91,36 +92,52 @@ export interface Brush extends Drawable {
   ): void;
 }
 
-export class CircleClearBrush implements Brush {
-  private size: number;
-  private outCanvas: HTMLCanvasElement;
+interface BrushStepParameters {
+  size: number;
+  colour: string;
+  compositeOperation: string;
+}
 
-  public constructor(size: number) {
-    this.size = size % 2 == 0 ? size + 1 : size;
+export class CircleBrush implements Brush {
+  private stepCount: number;
+  private stepParameters: BrushStepParameters[];
+  private stepCanvases: DetachedCanvas[];
 
-    this.outCanvas = document.createElement('canvas');
-    const outCtx = this.outCanvas.getContext('2d');
-    if (outCtx) {
-      this.outCanvas.width = this.size;
-      this.outCanvas.height = this.size;
-      outCtx.strokeStyle = '#000000';
-      outCtx.fillStyle = '#000000';
+  public constructor(stepParameters: BrushStepParameters[]) {
+    this.stepCount = stepParameters.length;
+    this.stepParameters = stepParameters;
+    this.stepCanvases = [];
+    this.stepParameters.forEach(p => {
+      if (p.size % 2 == 0)
+        p.size++;
+
+      var canvas = new DetachedCanvas(p.size, p.size);
+      canvas.ctx.strokeStyle = p.colour;
+      canvas.ctx.fillStyle = p.colour;
+
       DrawCircle(
-        Math.floor(this.size / 2),
-        Math.floor(this.size / 2),
-        Math.floor(this.size / 2),
-        outCtx
+        Math.floor(p.size / 2),
+        Math.floor(p.size / 2),
+        Math.floor(p.size / 2),
+        canvas.ctx
       );
-    }
+
+      this.stepCanvases.push(canvas);
+    });
   }
 
   public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
-    target.globalCompositeOperation = 'destination-out';
-    target.drawImage(
-      this.outCanvas,
-      Math.floor(0.5 + x - this.size / 2),
-      Math.floor(0.5 + y - this.size / 2)
-    );
+    for (let i = 0; i < this.stepCount; i++) {
+      const stepParameter = this.stepParameters[i];
+      const stepCanvas = this.stepCanvases[i];
+
+      target.globalCompositeOperation = stepParameter.compositeOperation;
+      target.drawImage(
+        stepCanvas.canvas,
+        Math.floor(0.5 + x - stepParameter.size / 2),
+        Math.floor(0.5 + y - stepParameter.size / 2)
+      );
+    }
   }
 
   public DrawLine(
@@ -134,57 +151,31 @@ export class CircleClearBrush implements Brush {
     y0 = Math.floor(y0);
     x1 = Math.floor(x1);
     y1 = Math.floor(y1);
-    StepDrawBresenhamLine(x0, y0, x1, y1, (x, y) => this.Draw(x, y, target));
+    StepBresenhamLine(x0, y0, x1, y1, (x, y) => this.Draw(x, y, target));
   }
 }
 
-export class CirclePixelBrush implements Brush {
-  private size: number;
-  private clearBrush: CircleClearBrush;
-  private brushCanvas: HTMLCanvasElement;
-
-  public constructor(size: number, colour: string) {
-    this.size = size % 2 == 0 ? size + 1 : size;
-    this.clearBrush = new CircleClearBrush(size);
-
-    this.brushCanvas = document.createElement('canvas');
-    const brushCtx = this.brushCanvas.getContext('2d');
-    if (brushCtx) {
-      this.brushCanvas.width = this.size;
-      this.brushCanvas.height = this.size;
-      brushCtx.strokeStyle = colour;
-      brushCtx.fillStyle = colour;
-      DrawCircle(
-        Math.floor(this.size / 2),
-        Math.floor(this.size / 2),
-        Math.floor(this.size / 2),
-        brushCtx
-      );
+export function CircleClearBrush(size: number) {
+  return new CircleBrush([
+    {
+      size: size,
+      colour: '#000000',
+      compositeOperation: 'destination-out'
     }
-  }
+  ]);
+}
 
-  public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
-    this.clearBrush.Draw(x, y, target);
-
-    target.globalCompositeOperation = 'source-over';
-    target.drawImage(
-      this.brushCanvas,
-      Math.floor(0.5 + x - this.size / 2),
-      Math.floor(0.5 + y - this.size / 2)
-    );
-  }
-
-  public DrawLine(
-    x0: number,
-    y0: number,
-    x1: number,
-    y1: number,
-    target: CanvasRenderingContext2D
-  ) {
-    x0 = Math.floor(x0);
-    y0 = Math.floor(y0);
-    x1 = Math.floor(x1);
-    y1 = Math.floor(y1);
-    StepDrawBresenhamLine(x0, y0, x1, y1, (x, y) => this.Draw(x, y, target));
-  }
+export function CirclePixelBrush(size: number, colour: string) {
+  return new CircleBrush([
+    {
+      size: size,
+      colour: '#000000',
+      compositeOperation: 'destination-out'
+    },
+    {
+      size: size,
+      colour: colour,
+      compositeOperation: 'source-over'
+    }
+  ]);
 }

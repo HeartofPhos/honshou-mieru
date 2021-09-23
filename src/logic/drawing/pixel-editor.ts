@@ -16,9 +16,9 @@ class PixelEditor implements Drawable {
 
   public SetBrush(size: number, color: string | null) {
     if (color) {
-      this.brush = new CirclePixelBrush(size, color);
+      this.brush = CirclePixelBrush(size, color);
     } else {
-      this.brush = new CircleClearBrush(size);
+      this.brush = CircleClearBrush(size);
     }
   }
 
