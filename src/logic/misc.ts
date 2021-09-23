@@ -27,6 +27,7 @@ export const SaveImage = (image: DynamicImage) => {
     fileSaver.saveAs(value, 'output.png');
   });
 };
+
 export const SaveGif = (images: DynamicImage[]) => {
   const stream = blobStream();
   const imageDataArray = images.map(x => x.GetData());
