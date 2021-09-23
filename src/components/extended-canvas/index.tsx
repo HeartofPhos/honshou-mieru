@@ -75,21 +75,19 @@ class ExtendedCanvas extends React.Component<Props> {
   }
 
   public componentDidUpdate(prevProps: Props) {
-    let requireDraw = false;
-    let requireRescaling =
-      this.props.position !== prevProps.position ||
-      this.props.scale !== prevProps.scale;
-
     const ctx = GetContext(this.canvasRef);
     if (!ctx) return;
 
+    let dirty =
+      this.props.position !== prevProps.position ||
+      this.props.scale !== prevProps.scale;
+
     if (this.props.size !== prevProps.size) {
       ResizeCanvas(this.props.size, ctx);
-      requireDraw = true;
-      requireRescaling = true;
+      dirty = true;
     }
 
-    if (requireRescaling) {
+    if (dirty) {
       ctx.setTransform(
         this.props.scale,
         0,
@@ -98,10 +96,7 @@ class ExtendedCanvas extends React.Component<Props> {
         this.props.position.x,
         this.props.position.y
       );
-      requireDraw = true;
-    }
 
-    if (requireDraw) {
       this.Draw();
     }
   }
