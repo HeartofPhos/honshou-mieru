@@ -14,7 +14,7 @@ export default class DetachedCanvas implements Drawable {
     this.ctx = pixelCtx;
   }
 
-  public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
+  public DrawToContext(x: number, y: number, target: CanvasRenderingContext2D) {
     target.drawImage(this.canvas, x, y);
   }
 

@@ -19,7 +19,7 @@ export default class EdgeRenderer implements DynamicDrawable {
     this.lineWidth = lineWidth;
   }
 
-  public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
+  public DrawToContext(x: number, y: number, target: CanvasRenderingContext2D) {
     if (this.edgeArray && this.lineWidth) {
       target.lineWidth = this.lineWidth;
       target.strokeStyle = 'yellow';

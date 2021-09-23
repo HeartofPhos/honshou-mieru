@@ -1,10 +1,10 @@
-import { DynamicDrawable, Brush, CirclePixelBrush } from '../drawing';
+import { DynamicDrawable, CirclePixelBrush, Drawable } from '../drawing';
 import { MaskType } from '../misc';
 
 class GhostRenderer implements DynamicDrawable {
   private x: number;
   private y: number;
-  private brush?: Brush;
+  private brush?: Drawable;
   private hideBrush: boolean;
 
   public onChange: (() => void)[];
@@ -36,9 +36,9 @@ class GhostRenderer implements DynamicDrawable {
     this.onChange.forEach(x => x());
   }
 
-  public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
+  public DrawToContext(x: number, y: number, target: CanvasRenderingContext2D) {
     if (this.brush && !this.hideBrush) {
-      this.brush.Draw(x + this.x, y + this.y, target);
+      this.brush.DrawToContext(x + this.x, y + this.y, target);
     }
   }
 

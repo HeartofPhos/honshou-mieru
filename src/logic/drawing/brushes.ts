@@ -82,23 +82,13 @@ const DrawCircle = (
   }
 };
 
-export interface Brush extends Drawable {
-  DrawLine(
-    x0: number,
-    y0: number,
-    x1: number,
-    y1: number,
-    target: CanvasRenderingContext2D
-  ): void;
-}
-
 interface BrushStepParameters {
   size: number;
   colour: string;
   compositeOperation: string;
 }
 
-export class CircleBrush implements Brush {
+export class CircleBrush implements Drawable {
   private stepCount: number;
   private stepParameters: BrushStepParameters[];
   private stepCanvases: DetachedCanvas[];
@@ -126,7 +116,7 @@ export class CircleBrush implements Brush {
     });
   }
 
-  public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
+  public DrawToContext(x: number, y: number, target: CanvasRenderingContext2D) {
     for (let i = 0; i < this.stepCount; i++) {
       const stepParameter = this.stepParameters[i];
       const stepCanvas = this.stepCanvases[i];
@@ -138,20 +128,6 @@ export class CircleBrush implements Brush {
         Math.floor(0.5 + y - stepParameter.size / 2)
       );
     }
-  }
-
-  public DrawLine(
-    x0: number,
-    y0: number,
-    x1: number,
-    y1: number,
-    target: CanvasRenderingContext2D
-  ) {
-    x0 = Math.floor(x0);
-    y0 = Math.floor(y0);
-    x1 = Math.floor(x1);
-    y1 = Math.floor(y1);
-    StepBresenhamLine(x0, y0, x1, y1, (x, y) => this.Draw(x, y, target));
   }
 }
 
@@ -178,4 +154,19 @@ export function CirclePixelBrush(size: number, colour: string) {
       compositeOperation: 'source-over'
     }
   ]);
+}
+
+export function DrawLineToContext(
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  target: CanvasRenderingContext2D,
+  drawable: Drawable
+) {
+  x0 = Math.floor(x0);
+  y0 = Math.floor(y0);
+  x1 = Math.floor(x1);
+  y1 = Math.floor(y1);
+  StepBresenhamLine(x0, y0, x1, y1, (x, y) => drawable.DrawToContext(x, y, target));
 }

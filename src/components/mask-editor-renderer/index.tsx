@@ -100,7 +100,7 @@ const MaskEditorRenderer = ({
         const x = (evt.clientX - rect.left - position.x) / scale;
         const y = (evt.clientY - rect.top - position.y) / scale;
 
-        maskEditor.DrawMask(x, y);
+        maskEditor.Draw(x, y);
 
         setDrawingState({
           IsDrawing: true,
@@ -123,7 +123,7 @@ const MaskEditorRenderer = ({
         if (!drawingState.IsDrawing) return;
         if (!maskEditor) return;
 
-        maskEditor.DrawMaskLine(drawingState.LastX, drawingState.LastY, x, y);
+        maskEditor.DrawLine(drawingState.LastX, drawingState.LastY, x, y);
 
         setDrawingState({
           IsDrawing: true,

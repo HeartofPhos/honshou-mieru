@@ -3,7 +3,7 @@ import DetachedCanvas from './detached-canvas';
 export * from './brushes';
 
 export interface Drawable {
-  Draw(x: number, y: number, target: CanvasRenderingContext2D): void;
+  DrawToContext(x: number, y: number, target: CanvasRenderingContext2D): void;
 }
 
 export interface DynamicDrawable extends Drawable {
@@ -18,7 +18,7 @@ export class CachedImage implements Drawable {
     this.detachedCanvas.ctx.putImageData(imageData, 0, 0);
   }
 
-  public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
+  public DrawToContext(x: number, y: number, target: CanvasRenderingContext2D) {
     target.drawImage(this.detachedCanvas.canvas, x, y);
   }
 }
@@ -33,7 +33,7 @@ export class DynamicImage implements DynamicDrawable {
     this.onChange = [];
   }
 
-  public Draw(x: number, y: number, target: CanvasRenderingContext2D) {
+  public DrawToContext(x: number, y: number, target: CanvasRenderingContext2D) {
     target.drawImage(this.detachedCanvas.canvas, x, y);
   }
 

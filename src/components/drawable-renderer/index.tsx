@@ -35,7 +35,7 @@ const DrawableRenderer = ({
       size={size}
       smoothingEnabled={smoothingEnabled}
       draw={ctx => {
-        if (drawable) drawable.Draw(0, 0, ctx);
+        if (drawable) drawable.DrawToContext(0, 0, ctx);
       }}
       ref={drawableCanvasRef}
     ></ExtendedCanvas>
