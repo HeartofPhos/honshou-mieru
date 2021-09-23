@@ -4,21 +4,20 @@ import ImageUpload from '../../components/image-upload';
 import Workspace from '../../components/workspace';
 
 import styles from './styles.css';
-import ndarray = require('ndarray');
 
 const Home = () => {
-  const [imageArray, setImageArray] = useState<ndarray>();
+  const [imageData, setImageData] = useState<ImageData>();
 
   return (
     <div className={styles.center}>
-      {!imageArray && (
+      {!imageData && (
         <ImageUpload
-          onUpload={image => {
-            setImageArray(image);
+          onUpload={imageData => {
+            setImageData(imageData);
           }}
         />
       )}
-      {imageArray && <Workspace imageArray={imageArray} />}
+      {imageData && <Workspace imageData={imageData} />}
     </div>
   );
 };

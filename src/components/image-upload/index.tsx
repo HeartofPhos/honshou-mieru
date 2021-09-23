@@ -1,32 +1,45 @@
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import ndarray = require('ndarray');
-import getPixels from 'get-pixels';
 
 import styles from './styles.css';
 
 interface Props {
-  onUpload: (image: ndarray) => void;
+  onUpload: (imageData: ImageData) => void;
+}
+
+function convertUriToImageData(uri: string) {
+  return new Promise<ImageData>(function (resolve, reject) {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    if (!context) return reject();
+
+    const image = new Image();
+    image.addEventListener(
+      'load',
+      function () {
+        canvas.width = image.width;
+        canvas.height = image.height;
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        resolve(context.getImageData(0, 0, canvas.width, canvas.height));
+      },
+      false
+    );
+    image.src = uri;
+  });
 }
 
 const ImageUpload = ({ onUpload }: Props) => {
-  const onDrop = useCallback(acceptedFiles => {
+  const onDrop = useCallback((acceptedFiles) => {
     if (acceptedFiles && acceptedFiles.length > 0) {
       const reader = new FileReader();
 
       reader.onabort = () => console.log('file reading was aborted');
       reader.onerror = () => console.log('file reading has failed');
-      reader.onload = () => {
-        const dataUrl = reader.result as string;
-        if (dataUrl) {
-          getPixels(dataUrl, function(err: any, img: ndarray) {
-            if (err) {
-              console.log('Bad image path');
-              return;
-            }
-
-            onUpload(img);
-          });
+      reader.onload = async () => {
+        const dataUri = reader.result as string;
+        if (dataUri) {
+          const imageData = await convertUriToImageData(dataUri);
+          onUpload(imageData);
         }
       };
 
@@ -37,7 +50,7 @@ const ImageUpload = ({ onUpload }: Props) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     multiple: false,
-    accept: ['image/png', 'image/gif', 'image/jpeg']
+    accept: ['image/png', 'image/gif', 'image/jpeg'],
   });
 
   return (

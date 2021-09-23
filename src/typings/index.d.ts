@@ -1,8 +1,4 @@
 /* eslint-disable no-unused-vars */
-declare module 'get-pixels';
-declare module 'gif-encoder';
-declare module 'blob-stream';
-
 declare module '*.css' {
   const styles: { [className: string]: string };
   export default styles;
