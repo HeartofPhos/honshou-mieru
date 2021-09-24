@@ -3,7 +3,7 @@ import {
   SegmentState,
   InitializeState,
   Segement,
-  Dispose
+  Dispose,
 } from '../../../open-cv/pipeline';
 const ctx = self as any;
 
@@ -29,7 +29,7 @@ ctx.addEventListener('message', (evt: any) => {
       {
         if (state != null) {
           const result = Segement(state, evt.data.maskBuffer);
-          const edgeBuffers = [];
+          const edgeBuffers: ArrayBufferLike[] = [];
           for (let i = 0; i < result.edgeArray.length; i++) {
             edgeBuffers.push(result.edgeArray[i].buffer);
           }
@@ -38,7 +38,7 @@ ctx.addEventListener('message', (evt: any) => {
             {
               action: 'result-updated',
               resultBuffer: result.resultArray.buffer,
-              edgeBuffers: edgeBuffers
+              edgeBuffers: edgeBuffers,
             },
             [result.resultArray.buffer, ...edgeBuffers]
           );

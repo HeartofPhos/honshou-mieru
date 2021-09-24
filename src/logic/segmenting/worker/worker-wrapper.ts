@@ -56,7 +56,7 @@ export default class GrabCutWorkerWrapper {
                 this.width,
                 this.height
               ),
-              evt.data.edgeBuffers.map((x: Buffer) => new Int32Array(x))
+              evt.data.edgeBuffers.map((x: ArrayBufferLike) => new Int32Array(x))
             );
 
             this.waitingForResponse = false;
