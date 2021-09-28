@@ -12,7 +12,7 @@ export default class EdgeRenderer implements DynamicDrawable {
 
   public UpdateEdgeArray(edgeArray: Int32Array[]) {
     this.edgeArray = edgeArray;
-    this.onChange.forEach(x => x());
+    this.onChange.forEach((x) => x());
   }
 
   public UpdateLineWidth(lineWidth: number) {

@@ -59,8 +59,8 @@ export const InitializeState = (
     OutputMask: new cv.Mat(height, width, cv.CV_8UC1),
     UnknownRegion: {
       Size: 3,
-      Mask: new cv.Mat(height, width, cv.CV_8UC1)
-    }
+      Mask: new cv.Mat(height, width, cv.CV_8UC1),
+    },
   };
   const t1 = performance.now();
   console.log(`InitializeState: ${t1 - t0}ms`);
@@ -89,7 +89,7 @@ export const Segement = (
 
   return {
     resultArray: result,
-    edgeArray: edges
+    edgeArray: edges,
   };
 };
 

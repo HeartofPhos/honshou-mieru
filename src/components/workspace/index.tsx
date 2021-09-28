@@ -24,7 +24,7 @@ const CalculateCanvasSize = (
   const h = Math.max(window.innerHeight, document.body.clientHeight);
   return {
     width: w / 2,
-    height: h - hOffset
+    height: h - hOffset,
   };
 };
 
@@ -36,16 +36,16 @@ const Workspace = ({ imageData }: Props) => {
   const [brushSize, setBrushSize] = useState(20);
   const [transformState, setTransformState] = useState({
     LastX: 0,
-    LastY: 0
+    LastY: 0,
   });
   const [canvasPosition, setCanvasPosition] = useState<CanvasPosition>({
     x: 0,
-    y: 0
+    y: 0,
   });
   const [canvasScale, setCanvasScale] = useState<number>(1);
   const [canvasSize, setCanvasSize] = useState<CanvasSize>({
     width: 0,
-    height: 0
+    height: 0,
   });
 
   useEffect(() => {
@@ -99,8 +99,8 @@ const Workspace = ({ imageData }: Props) => {
             className={styles.brushSettings}
             maskType={targetMaskType}
             brushSize={brushSize}
-            onMaskTypeChange={newMaskType => setTargetMaskType(newMaskType)}
-            onBrushSizeChange={newBrushSize => setBrushSize(newBrushSize)}
+            onMaskTypeChange={(newMaskType) => setTargetMaskType(newMaskType)}
+            onBrushSizeChange={(newBrushSize) => setBrushSize(newBrushSize)}
           ></BrushSettings>
           <button
             className={styles.save}
@@ -116,7 +116,7 @@ const Workspace = ({ imageData }: Props) => {
       <div
         className={styles.canvasHolder}
         ref={divRef}
-        onPointerDown={evt => {
+        onPointerDown={(evt) => {
           if ((evt.buttons & 4) !== 4) return;
           if (!divRef.current) return;
 
@@ -125,10 +125,10 @@ const Workspace = ({ imageData }: Props) => {
           const y = evt.clientY - rect.top;
           setTransformState({
             LastX: x,
-            LastY: y
+            LastY: y,
           });
         }}
-        onPointerMove={evt => {
+        onPointerMove={(evt) => {
           if (!divRef.current) return;
           if ((evt.buttons & 4) !== 4) return;
 
@@ -138,15 +138,15 @@ const Workspace = ({ imageData }: Props) => {
 
           setCanvasPosition({
             x: canvasPosition.x + (x - transformState.LastX),
-            y: canvasPosition.y + (y - transformState.LastY)
+            y: canvasPosition.y + (y - transformState.LastY),
           });
 
           setTransformState({
             LastX: x,
-            LastY: y
+            LastY: y,
           });
         }}
-        onWheel={evt => {
+        onWheel={(evt) => {
           const rect = evt.currentTarget.getBoundingClientRect();
 
           const pointerX = (evt.clientX - rect.left) % canvasSize.width;
@@ -161,7 +161,7 @@ const Workspace = ({ imageData }: Props) => {
           setCanvasScale(canvasScale * scaleFactor);
           setCanvasPosition({
             x: pointerX - deltaX * scaleFactor,
-            y: pointerY - deltaY * scaleFactor
+            y: pointerY - deltaY * scaleFactor,
           });
         }}
       >

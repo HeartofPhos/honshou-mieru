@@ -17,7 +17,7 @@ const DynamicCanvas = ({
   scale,
   size,
   smoothingEnabled,
-  drawable
+  drawable,
 }: Props) => {
   const drawableCanvasRef = React.useRef<ExtendedCanvas>(null);
 
@@ -41,7 +41,7 @@ const DynamicCanvas = ({
       scale={scale}
       size={size}
       smoothingEnabled={smoothingEnabled}
-      draw={ctx => {
+      draw={(ctx) => {
         if (drawable) drawable.DrawToContext(0, 0, ctx);
       }}
       ref={drawableCanvasRef}

@@ -97,9 +97,8 @@ export class CircleBrush implements Drawable {
     this.stepCount = stepParameters.length;
     this.stepParameters = stepParameters;
     this.stepCanvases = [];
-    this.stepParameters.forEach(p => {
-      if (p.size % 2 == 0)
-        p.size++;
+    this.stepParameters.forEach((p) => {
+      if (p.size % 2 == 0) p.size++;
 
       var canvas = new DetachedCanvas(p.size, p.size);
       canvas.ctx.strokeStyle = p.colour;
@@ -136,8 +135,8 @@ export function CircleClearBrush(size: number) {
     {
       size: size,
       colour: '#000000',
-      compositeOperation: 'destination-out'
-    }
+      compositeOperation: 'destination-out',
+    },
   ]);
 }
 
@@ -146,13 +145,13 @@ export function CirclePixelBrush(size: number, colour: string) {
     {
       size: size,
       colour: '#000000',
-      compositeOperation: 'destination-out'
+      compositeOperation: 'destination-out',
     },
     {
       size: size,
       colour: colour,
-      compositeOperation: 'source-over'
-    }
+      compositeOperation: 'source-over',
+    },
   ]);
 }
 
@@ -168,5 +167,7 @@ export function DrawLineToContext(
   y0 = Math.floor(y0);
   x1 = Math.floor(x1);
   y1 = Math.floor(y1);
-  StepBresenhamLine(x0, y0, x1, y1, (x, y) => drawable.DrawToContext(x, y, target));
+  StepBresenhamLine(x0, y0, x1, y1, (x, y) =>
+    drawable.DrawToContext(x, y, target)
+  );
 }

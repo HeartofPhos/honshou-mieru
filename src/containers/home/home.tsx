@@ -12,7 +12,7 @@ const Home = () => {
     <div className={styles.center}>
       {!imageData && (
         <ImageUpload
-          onUpload={imageData => {
+          onUpload={(imageData) => {
             setImageData(imageData);
           }}
         />

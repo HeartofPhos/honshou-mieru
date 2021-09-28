@@ -43,7 +43,7 @@ export class DynamicImage implements DynamicDrawable {
 
     this.detachedCanvas.ctx.putImageData(imageData, 0, 0);
 
-    this.onChange.forEach(x => x());
+    this.onChange.forEach((x) => x());
   }
 
   public GetData() {
@@ -52,7 +52,7 @@ export class DynamicImage implements DynamicDrawable {
 
   public ToBlob() {
     return new Promise((resolve: (value: Blob) => void, reject) => {
-      this.detachedCanvas.canvas.toBlob(blob => {
+      this.detachedCanvas.canvas.toBlob((blob) => {
         if (blob) resolve(blob);
         else reject('Could not create blob');
       });

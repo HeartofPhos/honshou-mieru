@@ -19,12 +19,12 @@ class MaskEditor implements DynamicDrawable {
 
   public Draw(x: number, y: number) {
     this.pixelEditor.Draw(x, y);
-    this.onChange.forEach(x => x());
+    this.onChange.forEach((x) => x());
   }
 
   public DrawLine(x0: number, y0: number, x1: number, y1: number) {
     this.pixelEditor.DrawLine(x0, y0, x1, y1);
-    this.onChange.forEach(x => x());
+    this.onChange.forEach((x) => x());
   }
 
   public DrawToContext(x: number, y: number, target: CanvasRenderingContext2D) {

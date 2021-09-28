@@ -3,7 +3,7 @@ import { ApplyToPlanes } from '../utility';
 
 const ApplyToLightPlane = (target: any, f: (lightPlane: any) => void) => {
   cv.cvtColor(target, target, cv.COLOR_RGB2Lab, 0);
-  ApplyToPlanes(target, planes => {
+  ApplyToPlanes(target, (planes) => {
     f(planes.get(0));
   });
   cv.cvtColor(target, target, cv.COLOR_Lab2RGB, 0);
@@ -136,7 +136,7 @@ export const InitializeSource = (original: any) => {
   const output = new cv.Mat();
   cv.cvtColor(original, output, cv.COLOR_RGBA2RGB, 0);
 
-  ApplyToLightPlane(output, lightPlane => {
+  ApplyToLightPlane(output, (lightPlane) => {
     CLAHE(lightPlane, 4, 4);
   });
   Sharpen(output, 19, 100, 0.5, 255);

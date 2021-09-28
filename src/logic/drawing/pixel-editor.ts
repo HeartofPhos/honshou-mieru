@@ -2,7 +2,7 @@ import {
   CircleClearBrush,
   CirclePixelBrush,
   Drawable,
-  DrawLineToContext
+  DrawLineToContext,
 } from '../../logic/drawing';
 import DetachedCanvas from './detached-canvas';
 

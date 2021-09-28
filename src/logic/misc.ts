@@ -12,5 +12,5 @@ export enum MaskType {
   Background,
   Foreground,
   ProbablyBackground,
-  ProbablyForeground
+  ProbablyForeground,
 }

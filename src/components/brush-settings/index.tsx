@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import styles from './styles.css';
 import { MaskType } from '../../logic/misc';
@@ -16,9 +16,9 @@ const BrushSettings = ({
   maskType,
   brushSize,
   onMaskTypeChange,
-  onBrushSizeChange
+  onBrushSizeChange,
 }: Props) => {
-  const targetMaskTypeChange = (element: any) => {
+  const targetMaskTypeChange = (element: HTMLInputElement) => {
     if (onMaskTypeChange) onMaskTypeChange(parseInt(element.value));
   };
 
@@ -31,7 +31,7 @@ const BrushSettings = ({
             type="radio"
             value={MaskType.Foreground}
             checked={maskType == MaskType.Foreground}
-            onChange={evt => targetMaskTypeChange(evt.target)}
+            onChange={(evt) => targetMaskTypeChange(evt.target)}
           />
           <span>Foreground</span>
         </label>
@@ -41,7 +41,7 @@ const BrushSettings = ({
             type="radio"
             value={MaskType.Background}
             checked={maskType == MaskType.Background}
-            onChange={evt => targetMaskTypeChange(evt.target)}
+            onChange={(evt) => targetMaskTypeChange(evt.target)}
           />
           <span>Background</span>
         </label>
@@ -51,7 +51,7 @@ const BrushSettings = ({
             type="radio"
             value={MaskType.ProbablyBackground}
             checked={maskType == MaskType.ProbablyBackground}
-            onChange={evt => targetMaskTypeChange(evt.target)}
+            onChange={(evt) => targetMaskTypeChange(evt.target)}
           />
           <span>Clear</span>
         </label>
@@ -65,7 +65,7 @@ const BrushSettings = ({
           step={5}
           value={brushSize}
           id="brushSizeRange"
-          onChange={evt => {
+          onChange={(evt) => {
             const value = parseInt(evt.target.value);
             if (onBrushSizeChange) onBrushSizeChange(value);
           }}

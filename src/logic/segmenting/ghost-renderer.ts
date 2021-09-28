@@ -19,21 +19,21 @@ class GhostRenderer implements DynamicDrawable {
 
   public SetBrush(size: number, maskType: MaskType) {
     this.brush = this.CreateBrush(size, maskType);
-    this.onChange.forEach(x => x());
+    this.onChange.forEach((x) => x());
   }
 
   public ClearGhost() {
     this.x = 0;
     this.y = 0;
     this.hideBrush = true;
-    this.onChange.forEach(x => x());
+    this.onChange.forEach((x) => x());
   }
 
   public SetGhostPosition(x: number, y: number) {
     this.x = x;
     this.y = y;
     this.hideBrush = false;
-    this.onChange.forEach(x => x());
+    this.onChange.forEach((x) => x());
   }
 
   public DrawToContext(x: number, y: number, target: CanvasRenderingContext2D) {

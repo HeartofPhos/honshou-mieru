@@ -27,7 +27,7 @@ export default class GrabCutWorkerWrapper {
     this.bufferedMaskUpdatedMessage = null;
     resultCallback(imageData, []);
 
-    this.grabCutWorker.onmessage = evt => {
+    this.grabCutWorker.onmessage = (evt) => {
       switch (evt.data.action) {
         case 'ready':
           {
@@ -37,7 +37,7 @@ export default class GrabCutWorkerWrapper {
                 action: 'initialize',
                 sourceBuffer: imageData.data.buffer,
                 width: this.width,
-                height: this.height
+                height: this.height,
               },
               [imageData.data.buffer]
             );
@@ -56,7 +56,9 @@ export default class GrabCutWorkerWrapper {
                 this.width,
                 this.height
               ),
-              evt.data.edgeBuffers.map((x: ArrayBufferLike) => new Int32Array(x))
+              evt.data.edgeBuffers.map(
+                (x: ArrayBufferLike) => new Int32Array(x)
+              )
             );
 
             this.waitingForResponse = false;
@@ -71,7 +73,7 @@ export default class GrabCutWorkerWrapper {
 
   public UpdateMask(maskImageData: ImageData) {
     const newMessage = {
-      buffer: maskImageData.data.buffer
+      buffer: maskImageData.data.buffer,
     };
 
     this.PostUpdateMask(newMessage);
@@ -84,7 +86,7 @@ export default class GrabCutWorkerWrapper {
       this.grabCutWorker.postMessage(
         {
           action: 'mask-updated',
-          maskBuffer: message.buffer
+          maskBuffer: message.buffer,
         },
         [message.buffer]
       );

@@ -2,7 +2,7 @@ import {
   Drawable,
   CachedImage,
   DynamicDrawable,
-  DynamicImage
+  DynamicImage,
 } from '../drawing';
 import GrabCutWorkerWrapper from './worker/worker-wrapper';
 import MaskEditor from './mask-editor';

@@ -14,6 +14,6 @@ export const InitializeGrabCut = (
   return {
     Mask: mask,
     BackgroundModel: bgdModel,
-    ForegroundModel: fgdModel
+    ForegroundModel: fgdModel,
   };
 };

@@ -40,14 +40,14 @@ const MaskEditorRenderer = ({
   edgeRenderer,
   targetMaskType,
   brushSize,
-  onMaskChanged
+  onMaskChanged,
 }: Props) => {
   const divRef = React.useRef<HTMLDivElement>(null);
 
   const [drawingState, setDrawingState] = useState<DrawingState>({
     IsDrawing: false,
     LastX: 0,
-    LastY: 0
+    LastY: 0,
   });
 
   useMemo(() => {
@@ -91,7 +91,7 @@ const MaskEditorRenderer = ({
           ghostRenderer.ClearGhost();
         }
       }}
-      onPointerDown={evt => {
+      onPointerDown={(evt) => {
         if ((evt.buttons & 1) !== 1) return;
         if (!maskEditor) return;
         if (!divRef.current) return;
@@ -105,10 +105,10 @@ const MaskEditorRenderer = ({
         setDrawingState({
           IsDrawing: true,
           LastX: x,
-          LastY: y
+          LastY: y,
         });
       }}
-      onPointerMove={evt => {
+      onPointerMove={(evt) => {
         if (!divRef.current) return;
 
         const rect = divRef.current.getBoundingClientRect();
@@ -128,7 +128,7 @@ const MaskEditorRenderer = ({
         setDrawingState({
           IsDrawing: true,
           LastX: x,
-          LastY: y
+          LastY: y,
         });
       }}
     >
