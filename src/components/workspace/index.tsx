@@ -24,7 +24,7 @@ const CalculateCanvasSize = (
   const h = Math.max(window.innerHeight, document.body.clientHeight);
   return {
     width: w / 2,
-    height: h - hOffset,
+    height: h - hOffset
   };
 };
 
@@ -36,16 +36,16 @@ const Workspace = ({ imageData }: Props) => {
   const [brushSize, setBrushSize] = useState(20);
   const [transformState, setTransformState] = useState({
     LastX: 0,
-    LastY: 0,
+    LastY: 0
   });
   const [canvasPosition, setCanvasPosition] = useState<CanvasPosition>({
     x: 0,
-    y: 0,
+    y: 0
   });
   const [canvasScale, setCanvasScale] = useState<number>(1);
   const [canvasSize, setCanvasSize] = useState<CanvasSize>({
     width: 0,
-    height: 0,
+    height: 0
   });
 
   useEffect(() => {
@@ -99,15 +99,14 @@ const Workspace = ({ imageData }: Props) => {
             className={styles.brushSettings}
             maskType={targetMaskType}
             brushSize={brushSize}
-            onMaskTypeChange={(newMaskType) => setTargetMaskType(newMaskType)}
-            onBrushSizeChange={(newBrushSize) => setBrushSize(newBrushSize)}
+            onMaskTypeChange={newMaskType => setTargetMaskType(newMaskType)}
+            onBrushSizeChange={newBrushSize => setBrushSize(newBrushSize)}
           ></BrushSettings>
           <button
             className={styles.save}
             onClick={() => {
               if (!segmentWrapper) return;
               SaveImage(segmentWrapper.ResultDrawable);
-              // SaveGif([segmentWrapper.ResultDrawable]);
             }}
           >
             Save
@@ -117,7 +116,7 @@ const Workspace = ({ imageData }: Props) => {
       <div
         className={styles.canvasHolder}
         ref={divRef}
-        onPointerDown={(evt) => {
+        onPointerDown={evt => {
           if ((evt.buttons & 4) !== 4) return;
           if (!divRef.current) return;
 
@@ -126,10 +125,10 @@ const Workspace = ({ imageData }: Props) => {
           const y = evt.clientY - rect.top;
           setTransformState({
             LastX: x,
-            LastY: y,
+            LastY: y
           });
         }}
-        onPointerMove={(evt) => {
+        onPointerMove={evt => {
           if (!divRef.current) return;
           if ((evt.buttons & 4) !== 4) return;
 
@@ -139,34 +138,30 @@ const Workspace = ({ imageData }: Props) => {
 
           setCanvasPosition({
             x: canvasPosition.x + (x - transformState.LastX),
-            y: canvasPosition.y + (y - transformState.LastY),
+            y: canvasPosition.y + (y - transformState.LastY)
           });
 
           setTransformState({
             LastX: x,
-            LastY: y,
+            LastY: y
           });
         }}
-        onWheel={(evt) => {
+        onWheel={evt => {
           const rect = evt.currentTarget.getBoundingClientRect();
-          const x = (evt.clientX - rect.left) % canvasSize.width;
-          const y = (evt.clientY - rect.top) % canvasSize.height;
 
-          const oldX = (x - canvasPosition.x) / canvasScale;
-          const oldY = (y - canvasPosition.y) / canvasScale;
+          const pointerX = (evt.clientX - rect.left) % canvasSize.width;
+          const pointerY = (evt.clientY - rect.top) % canvasSize.height;
+
+          const deltaX = pointerX - canvasPosition.x;
+          const deltaY = pointerY - canvasPosition.y;
 
           const sign = evt.deltaY < 0 ? 1 : -1;
           const scaleFactor = 1 + 0.1 * sign;
 
-          const newScale = canvasScale * scaleFactor;
-          setCanvasScale(newScale);
-
-          const newX = oldX * newScale + canvasPosition.x;
-          const newY = oldY * newScale + canvasPosition.y;
-
+          setCanvasScale(canvasScale * scaleFactor);
           setCanvasPosition({
-            x: canvasPosition.x + (x - newX),
-            y: canvasPosition.y + (y - newY),
+            x: pointerX - deltaX * scaleFactor,
+            y: pointerY - deltaY * scaleFactor
           });
         }}
       >
