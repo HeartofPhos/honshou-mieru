@@ -155,8 +155,8 @@ const Workspace = ({ imageData }: Props) => {
           const deltaX = pointerX - canvasPosition.x;
           const deltaY = pointerY - canvasPosition.y;
 
-          const sign = evt.deltaY < 0 ? 1 : -1;
-          const scaleFactor = 1 + 0.1 * sign;
+          let scaleFactor = 0.9;
+          if (evt.deltaY < 0) scaleFactor = 1 / scaleFactor;
 
           setCanvasScale(canvasScale * scaleFactor);
           setCanvasPosition({
