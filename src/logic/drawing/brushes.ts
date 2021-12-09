@@ -123,8 +123,8 @@ export class CircleBrush implements Drawable {
       target.globalCompositeOperation = stepParameter.compositeOperation;
       target.drawImage(
         stepCanvas.canvas,
-        Math.floor(0.5 + x - stepParameter.size / 2),
-        Math.floor(0.5 + y - stepParameter.size / 2)
+        Math.round(x - stepParameter.size / 2),
+        Math.round(y - stepParameter.size / 2)
       );
     }
   }
