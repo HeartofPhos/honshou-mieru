@@ -21,7 +21,7 @@ var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
-import { r as react, j as jsx, F as Fragment, P as PropTypes, a as jsxs, R as React } from "./index.26b9019d.js";
+import { r as react, j as jsx, F as Fragment, P as PropTypes, a as jsxs, R as React } from "./index.e8869c89.js";
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function __awaiter(thisArg, _arguments, P, generator) {
   function adopt(value) {
@@ -1796,8 +1796,8 @@ const CalculateCanvasSize = (elementRef) => {
   if (elementRef.current) {
     hOffset = elementRef.current.offsetTop;
   }
-  const w = Math.max(window.innerWidth, document.body.clientWidth);
-  const h = Math.max(window.innerHeight, document.body.clientHeight);
+  const w = window.innerWidth;
+  const h = window.innerHeight;
   return {
     width: w / 2,
     height: h - hOffset

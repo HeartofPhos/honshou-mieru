@@ -8220,7 +8220,7 @@ const Loader = ({
   src: logoUrl,
   className: classnames("logo", "animating", className)
 });
-const Home = react.exports.lazy(() => __vitePreload(() => import("./home.6837c060.js"), true ? ["assets/home.6837c060.js","assets/home.aa5b3ee8.css"] : void 0));
+const Home = react.exports.lazy(() => __vitePreload(() => import("./home.f77ac2a5.js"), true ? ["assets/home.f77ac2a5.js","assets/home.aa5b3ee8.css"] : void 0));
 const LazyHome = (props) => /* @__PURE__ */ jsx(react.exports.Suspense, {
   fallback: /* @__PURE__ */ jsx(Loader, {}),
   children: /* @__PURE__ */ jsx(Home, __spreadValues({}, props))
