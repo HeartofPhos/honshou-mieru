@@ -6,4 +6,5 @@ export default defineConfig({
   plugins: [react()],
   worker: { format: 'es' },
   base: '/honshou-mieru/',
+  build: { target: 'esnext', minify: false },
 });
