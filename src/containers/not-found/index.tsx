@@ -1,15 +1,14 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 
-import { ReactComponent as NotFoundSVG } from './404.svg';
-
-import styles from './styles.css';
+import './styles.css';
+import notFoundUrl from './404.svg';
 
 const NotFound = () => (
-  <div className={styles.notFound}>
+  <div className={'notFound'}>
     <Helmet title="HonshouMieru - Not Found!" />
     <h1>Uhhh</h1>
-    <NotFoundSVG className={styles.image} />
+    <img src={notFoundUrl} className={'image'} />
     <p>This doesn&apos;t seem right...</p>
   </div>
 );

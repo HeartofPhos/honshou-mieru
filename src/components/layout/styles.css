@@ -12,7 +12,6 @@
 
 body {
   margin: 0;
-  padding: 0;
   font-family: 'Lato', sans-serif;
   background-color: var(--mineshaft);
   color: var(--alabaster);
@@ -26,17 +25,4 @@ svg {
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 1rem;
-}
-
-@media (min-width: 1280px) {
-  .container {
-    padding: 0;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: var(--mineshaft);
-    color: var(--alabaster);
-  }
 }

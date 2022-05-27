@@ -1,4 +1,4 @@
-import { cv } from '../open-cv-wrapper';
+import cv from '../open-cv-wrapper';
 
 export const ApplyToPlanes = (target: any, f: (planes: any) => void) => {
   const tempPlanes = new cv.MatVector();

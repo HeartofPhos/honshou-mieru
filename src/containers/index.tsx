@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import Layout from '../components/layout';
 
@@ -8,10 +8,10 @@ import NotFound from './not-found';
 
 const App = () => (
   <Layout>
-    <Switch>
-      <Route from="/" component={Home} exact />
-      <Route component={NotFound} />
-    </Switch>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route element={<NotFound />} />
+    </Routes>
   </Layout>
 );
 

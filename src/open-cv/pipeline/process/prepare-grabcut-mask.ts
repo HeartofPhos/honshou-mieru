@@ -1,4 +1,4 @@
-import { cv } from '../../open-cv-wrapper';
+import cv from '../../open-cv-wrapper';
 import { SegmentState } from '..';
 
 export const PrepareGrabcutMask = (

@@ -42,6 +42,11 @@
   display: flex;
 }
 
+.rendererDiv {
+  display: flex;
+  position: relative;
+}
+
 .baseCanvas {
   image-rendering: pixelated;
 }

@@ -1,18 +1,17 @@
-import { cv } from '../../../open-cv/open-cv-wrapper';
+import cv from '../../../open-cv/open-cv-wrapper';
 import {
   SegmentState,
   InitializeState,
   Segement,
   Dispose,
 } from '../../../open-cv/pipeline';
-const ctx = self as any;
 
 cv.onRuntimeInitialized = async () => {
-  ctx.postMessage({ action: 'ready' });
+  self.postMessage({ action: 'ready' });
 };
 
 let state: SegmentState | null;
-ctx.addEventListener('message', (evt: any) => {
+self.addEventListener('message', (evt: any) => {
   switch (evt.data.action) {
     case 'initialize':
       {
@@ -34,7 +33,7 @@ ctx.addEventListener('message', (evt: any) => {
             edgeBuffers.push(result.edgeArray[i].buffer);
           }
 
-          ctx.postMessage(
+          self.postMessage(
             {
               action: 'result-updated',
               resultBuffer: result.resultArray.buffer,
@@ -51,7 +50,7 @@ ctx.addEventListener('message', (evt: any) => {
           Dispose(state);
           state = null;
         }
-        ctx.close();
+        self.close();
       }
       break;
   }

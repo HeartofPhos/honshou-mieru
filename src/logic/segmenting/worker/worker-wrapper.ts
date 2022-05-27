@@ -1,5 +1,3 @@
-import GrabCutWorker from 'worker-loader!./worker';
-
 interface MaskUpdatedMessage {
   buffer: ArrayBuffer;
 }
@@ -8,7 +6,7 @@ export default class GrabCutWorkerWrapper {
   private width: number;
   private height: number;
 
-  private grabCutWorker: GrabCutWorker;
+  private grabCutWorker: Worker;
   private waitingForResponse: boolean;
   private bufferedMaskUpdatedMessage: MaskUpdatedMessage | null;
 
@@ -22,12 +20,14 @@ export default class GrabCutWorkerWrapper {
     this.width = imageData.width;
     this.height = imageData.height;
 
-    this.grabCutWorker = new GrabCutWorker();
+    this.grabCutWorker = new Worker(new URL('./worker.ts', import.meta.url), {
+      type: 'module',
+    });
     this.waitingForResponse = true;
     this.bufferedMaskUpdatedMessage = null;
     resultCallback(imageData, []);
 
-    this.grabCutWorker.onmessage = (evt) => {
+    this.grabCutWorker.onmessage = (evt: any) => {
       switch (evt.data.action) {
         case 'ready':
           {
@@ -38,8 +38,7 @@ export default class GrabCutWorkerWrapper {
                 sourceBuffer: imageData.data.buffer,
                 width: this.width,
                 height: this.height,
-              },
-              [imageData.data.buffer]
+              }
             );
 
             this.waitingForResponse = false;

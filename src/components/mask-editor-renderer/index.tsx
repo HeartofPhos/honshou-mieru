@@ -1,7 +1,7 @@
 //@ts-ignore
 import React, { useMemo, useState } from 'react';
 import { MaskType } from '../../logic/misc';
-import styles from './styles.css';
+import './styles.css';
 import MaskEditor from '../../logic/segmenting/mask-editor';
 import { Drawable, DynamicDrawable } from '../../logic/drawing';
 import { CanvasSize, CanvasPosition } from '../extended-canvas';
@@ -70,7 +70,7 @@ const MaskEditorRenderer = ({
 
   return (
     <div
-      className={styles.rendererDiv}
+      className={"rendererDiv"}
       ref={divRef}
       onPointerUp={() => {
         if (drawingState.IsDrawing) {
@@ -133,7 +133,7 @@ const MaskEditorRenderer = ({
       }}
     >
       <DrawableRenderer
-        className={styles.baseCanvas}
+        className={"baseCanvas"}
         position={position}
         scale={scale}
         size={size}
@@ -141,7 +141,7 @@ const MaskEditorRenderer = ({
         drawable={baseImage}
       ></DrawableRenderer>
       <DynamicCanvas
-        className={styles.stackedCanvas}
+        className={"stackedCanvas"}
         position={position}
         scale={scale}
         size={size}
@@ -149,7 +149,7 @@ const MaskEditorRenderer = ({
         drawable={maskEditor}
       ></DynamicCanvas>
       <DynamicCanvas
-        className={styles.stackedCanvas}
+        className={"stackedCanvas"}
         position={position}
         scale={scale}
         size={size}
@@ -157,7 +157,7 @@ const MaskEditorRenderer = ({
         drawable={ghostRenderer}
       ></DynamicCanvas>
       <DynamicCanvas
-        className={styles.stackedCanvas}
+        className={"stackedCanvas"}
         position={position}
         scale={scale}
         size={size}

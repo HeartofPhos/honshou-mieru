@@ -1,4 +1,4 @@
-import fileSaver = require('file-saver');
+import fileSaver from 'file-saver';
 import { DynamicImage } from './drawing';
 
 export const SaveImage = (image: DynamicImage) => {

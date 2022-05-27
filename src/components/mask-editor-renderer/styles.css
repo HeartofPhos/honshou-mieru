@@ -1,4 +1,5 @@
 .rendererDiv {
+  display: flex;
   position: relative;
 }
 

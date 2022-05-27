@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styles from './styles.css';
+import './styles.css';
 
 interface Props {
   children: React.ReactNode;
@@ -8,7 +8,7 @@ interface Props {
 
 const Layout = ({ children }: Props) => (
   <>
-    <main className={styles.container}>{children}</main>
+    <main className={"container"}>{children}</main>
   </>
 );
 

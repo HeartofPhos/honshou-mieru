@@ -1,4 +1,4 @@
-import { cv } from '../open-cv-wrapper';
+import cv from '../open-cv-wrapper';
 import { InitializeGrabCut } from './initialize/initialize-grabcut';
 import { InitializeSource } from './initialize/initialize-source';
 import { PrepareGrabcutMask } from './process/prepare-grabcut-mask';

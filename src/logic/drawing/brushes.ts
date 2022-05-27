@@ -85,7 +85,7 @@ const DrawCircle = (
 interface BrushStepParameters {
   size: number;
   colour: string;
-  compositeOperation: string;
+  compositeOperation: GlobalCompositeOperation;
 }
 
 export class CircleBrush implements Drawable {

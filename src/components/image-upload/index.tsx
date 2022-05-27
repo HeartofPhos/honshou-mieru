@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 
-import styles from './styles.css';
+import './styles.css';
 
 interface Props {
   onUpload: (imageData: ImageData) => void;
@@ -29,7 +29,7 @@ function convertUriToImageData(uri: string) {
 }
 
 const ImageUpload = ({ onUpload }: Props) => {
-  const onDrop = useCallback((acceptedFiles) => {
+  const onDrop = useCallback((acceptedFiles: any[]) => {
     if (acceptedFiles && acceptedFiles.length > 0) {
       const reader = new FileReader();
 
@@ -54,7 +54,7 @@ const ImageUpload = ({ onUpload }: Props) => {
   });
 
   return (
-    <div className={styles.dragDrop} {...getRootProps()}>
+    <div className={'dragDrop'} {...getRootProps()}>
       <input {...getInputProps()} />
       {isDragActive ? (
         <p>Drop the files here ...</p>

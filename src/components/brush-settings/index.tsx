@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styles from './styles.css';
+import './styles.css';
 import { MaskType } from '../../logic/misc';
 
 interface Props {
@@ -24,7 +24,7 @@ const BrushSettings = ({
 
   return (
     <div className={className}>
-      <form className={styles.flexGroup}>
+      <form className={"flexGroup"}>
         <label>
           <input
             id="foreground"
@@ -56,9 +56,9 @@ const BrushSettings = ({
           <span>Clear</span>
         </label>
       </form>
-      <div className={styles.flexGroup}>
+      <div className={"flexGroup"}>
         <input
-          className={styles.brushSizeRange}
+          className={"brushSizeRange"}
           type="range"
           min={5}
           max={50}

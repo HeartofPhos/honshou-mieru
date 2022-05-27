@@ -1,16 +1,15 @@
 import React from 'react';
 import classnames from 'classnames';
 
-import { ReactComponent as Logo } from './logo.svg';
-
-import styles from './styles.css';
+import './styles.css';
+import logoUrl from './logo.svg';
 
 interface Props {
   className?: string;
 }
 
 const Loader = ({ className }: Props) => (
-  <Logo className={classnames(styles.logo, styles.animating, className)} />
+  <img src={logoUrl} className={classnames('logo', 'animating', className)} />
 );
 
 export default Loader;

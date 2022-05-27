@@ -1,4 +1,5 @@
+//https://stackoverflow.com/a/72086225
 //@ts-ignore
-import cv = require('./opencv.js');
-
-export { cv };
+const cv = import('./opencv-4.5.0.js');
+//@ts-ignore
+export default cv as any;

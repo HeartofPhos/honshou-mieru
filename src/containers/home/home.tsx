@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import ImageUpload from '../../components/image-upload';
 import Workspace from '../../components/workspace';
 
-import styles from './styles.css';
+import './styles.css';
 
 const Home = () => {
   const [imageData, setImageData] = useState<ImageData>();
 
   return (
-    <div className={styles.center}>
+    <div className={"center"}>
       {!imageData && (
         <ImageUpload
           onUpload={(imageData) => {

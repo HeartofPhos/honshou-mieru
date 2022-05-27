@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 
 import { MaskType, SaveImage } from '../../logic/misc';
-import styles from './styles.css';
+import './styles.css';
 import MaskEditorRenderer from '../mask-editor-renderer';
 import { CanvasPosition, CanvasSize } from '../extended-canvas';
 import SegmentWrapper from '../../logic/segmenting/segment-wrapper';
@@ -93,17 +93,17 @@ const Workspace = ({ imageData }: Props) => {
 
   return (
     <div>
-      <div className={styles.controlsHolder}>
-        <div className={styles.controlsBox}>
+      <div className={'controlsHolder'}>
+        <div className={'controlsBox'}>
           <BrushSettings
-            className={styles.brushSettings}
+            className={'brushSettings'}
             maskType={targetMaskType}
             brushSize={brushSize}
             onMaskTypeChange={(newMaskType) => setTargetMaskType(newMaskType)}
             onBrushSizeChange={(newBrushSize) => setBrushSize(newBrushSize)}
           ></BrushSettings>
           <button
-            className={styles.save}
+            className={'save'}
             onClick={() => {
               if (!segmentWrapper) return;
               SaveImage(segmentWrapper.ResultDrawable);
@@ -114,7 +114,7 @@ const Workspace = ({ imageData }: Props) => {
         </div>
       </div>
       <div
-        className={styles.canvasHolder}
+        className={'canvasHolder'}
         ref={divRef}
         onPointerDown={(evt) => {
           if ((evt.buttons & 4) !== 4) return;
@@ -182,9 +182,9 @@ const Workspace = ({ imageData }: Props) => {
           ></MaskEditorRenderer>
         )}
         {segmentWrapper && (
-          <div style={{ position: 'relative' }}>
+          <div className={'rendererDiv'}>
             <DynamicCanvas
-              className={styles.baseCanvas}
+              className={'baseCanvas'}
               position={canvasPosition}
               scale={canvasScale}
               size={canvasSize}
@@ -192,7 +192,7 @@ const Workspace = ({ imageData }: Props) => {
               drawable={segmentWrapper.ResultDrawable}
             ></DynamicCanvas>
             <DynamicCanvas
-              className={styles.stackedCanvas}
+              className={'stackedCanvas'}
               position={canvasPosition}
               scale={canvasScale}
               size={canvasSize}
