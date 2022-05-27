@@ -1,4 +1,3 @@
-import cv from '../../open-cv-wrapper';
 import { GrabCutState } from '..';
 
 export const InitializeGrabCut = (

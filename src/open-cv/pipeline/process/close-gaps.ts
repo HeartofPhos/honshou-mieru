@@ -1,4 +1,3 @@
-import cv from '../../open-cv-wrapper';
 import { SegmentState } from '..';
 
 const InterpretPair = (target: any, areaType: number, targetType: number) => {

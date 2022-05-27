@@ -1,4 +1,3 @@
-import cv from '../../open-cv-wrapper';
 import { ApplyToPlanes } from '../utility';
 
 const ApplyToLightPlane = (target: any, f: (lightPlane: any) => void) => {

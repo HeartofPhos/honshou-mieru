@@ -1,14 +1,16 @@
-import cv from '../../../open-cv/open-cv-wrapper';
+/// <reference lib="webworker" />
+
+importScripts('opencv-4.5.0.js');
+declare global {
+  var cv: any;
+}
+
 import {
   SegmentState,
   InitializeState,
   Segement,
   Dispose,
 } from '../../../open-cv/pipeline';
-
-cv.onRuntimeInitialized = async () => {
-  self.postMessage({ action: 'ready' });
-};
 
 let state: SegmentState | null;
 self.addEventListener('message', (evt: any) => {
@@ -55,3 +57,7 @@ self.addEventListener('message', (evt: any) => {
       break;
   }
 });
+
+cv.onRuntimeInitialized = async () => {
+  self.postMessage({ action: 'ready' });
+};

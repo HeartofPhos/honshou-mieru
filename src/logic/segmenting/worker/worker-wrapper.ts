@@ -21,7 +21,7 @@ export default class GrabCutWorkerWrapper {
     this.height = imageData.height;
 
     this.grabCutWorker = new Worker(new URL('./worker.ts', import.meta.url), {
-      type: 'module',
+      type: 'classic',
     });
     this.waitingForResponse = true;
     this.bufferedMaskUpdatedMessage = null;

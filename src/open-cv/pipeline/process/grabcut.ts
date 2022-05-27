@@ -1,4 +1,3 @@
-import cv from '../../open-cv-wrapper';
 import { SegmentState } from '..';
 
 export const GrabCut = (state: SegmentState) => {

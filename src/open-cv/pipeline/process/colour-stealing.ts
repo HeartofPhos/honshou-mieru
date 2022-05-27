@@ -1,4 +1,3 @@
-import cv from '../../open-cv-wrapper';
 import { SegmentState } from '..';
 
 const ColourSize = 5;
