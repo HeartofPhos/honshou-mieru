@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "deploy": "gh-pages -d dist --repo git@github.com:HeartofPhos/honshou-mieru.git"
+    "deploy": "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
