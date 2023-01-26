@@ -21,7 +21,7 @@ var __publicField = (obj, key, value) => {
   __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
-import { r as react, j as jsx, F as Fragment, P as PropTypes, a as jsxs, R as React } from "./index.e8869c89.js";
+import { r as react, j as jsx, F as Fragment, P as PropTypes, a as jsxs, R as React } from "./index.551efc7a.js";
 var commonjsGlobal = typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : {};
 function __awaiter(thisArg, _arguments, P, generator) {
   function adopt(value) {
@@ -1810,10 +1810,6 @@ const Workspace = ({
   const [segmentWrapper, setSegmentWrapper] = react.exports.useState();
   const [targetMaskType, setTargetMaskType] = react.exports.useState(MaskType.Foreground);
   const [brushSize, setBrushSize] = react.exports.useState(20);
-  const [transformState, setTransformState] = react.exports.useState({
-    LastX: 0,
-    LastY: 0
-  });
   const [canvasPosition, setCanvasPosition] = react.exports.useState({
     x: 0,
     y: 0
@@ -1876,34 +1872,12 @@ const Workspace = ({
     }), /* @__PURE__ */ jsxs("div", {
       className: "canvasHolder",
       ref: divRef,
-      onPointerDown: (evt) => {
-        if ((evt.buttons & 4) !== 4)
-          return;
-        if (!divRef.current)
-          return;
-        const rect = evt.currentTarget.getBoundingClientRect();
-        const x = evt.clientX - rect.left;
-        const y = evt.clientY - rect.top;
-        setTransformState({
-          LastX: x,
-          LastY: y
-        });
-      },
       onPointerMove: (evt) => {
-        if (!divRef.current)
-          return;
         if ((evt.buttons & 4) !== 4)
           return;
-        const rect = evt.currentTarget.getBoundingClientRect();
-        const x = evt.clientX - rect.left;
-        const y = evt.clientY - rect.top;
         setCanvasPosition({
-          x: canvasPosition.x + (x - transformState.LastX),
-          y: canvasPosition.y + (y - transformState.LastY)
-        });
-        setTransformState({
-          LastX: x,
-          LastY: y
+          x: canvasPosition.x + evt.movementX,
+          y: canvasPosition.y + evt.movementY
         });
       },
       onWheel: (evt) => {
