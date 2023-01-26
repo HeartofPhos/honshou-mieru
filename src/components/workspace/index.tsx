@@ -35,10 +35,6 @@ const Workspace = ({ imageData }: Props) => {
   const [segmentWrapper, setSegmentWrapper] = useState<SegmentWrapper>();
   const [targetMaskType, setTargetMaskType] = useState(MaskType.Foreground);
   const [brushSize, setBrushSize] = useState(20);
-  const [transformState, setTransformState] = useState({
-    LastX: 0,
-    LastY: 0,
-  });
   const [canvasPosition, setCanvasPosition] = useState<CanvasPosition>({
     x: 0,
     y: 0,
@@ -117,34 +113,12 @@ const Workspace = ({ imageData }: Props) => {
       <div
         className={'canvasHolder'}
         ref={divRef}
-        onPointerDown={(evt) => {
-          if ((evt.buttons & 4) !== 4) return;
-          if (!divRef.current) return;
-
-          const rect = evt.currentTarget.getBoundingClientRect();
-          const x = evt.clientX - rect.left;
-          const y = evt.clientY - rect.top;
-          setTransformState({
-            LastX: x,
-            LastY: y,
-          });
-        }}
         onPointerMove={(evt) => {
-          if (!divRef.current) return;
           if ((evt.buttons & 4) !== 4) return;
-
-          const rect = evt.currentTarget.getBoundingClientRect();
-          const x = evt.clientX - rect.left;
-          const y = evt.clientY - rect.top;
 
           setCanvasPosition({
-            x: canvasPosition.x + (x - transformState.LastX),
-            y: canvasPosition.y + (y - transformState.LastY),
-          });
-
-          setTransformState({
-            LastX: x,
-            LastY: y,
+            x: canvasPosition.x + evt.movementX,
+            y: canvasPosition.y + evt.movementY,
           });
         }}
         onWheel={(evt) => {
